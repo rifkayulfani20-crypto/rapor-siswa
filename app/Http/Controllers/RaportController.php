@@ -15,8 +15,8 @@ class RaportController extends Controller {
             ->where('tahun_pelajaran_id', $tapel?->id)
             ->get();
         $kehadiran = $siswa->kehadiran;
-        $prestasi  = $siswa->prestasi()->where('tahun_pelajaran_id', $tapel?->id)->get();
-        $catatan   = $siswa->catatan;
+        $prestasi  = collect(); // kosongkan dulu karena model Prestasi belum ada
+        $catatan   = null;       // belum ada model CatatanSiswa
         return view('raport.cetak', compact('siswa','tapel','nilais','kehadiran','prestasi','catatan'));
     }
 }

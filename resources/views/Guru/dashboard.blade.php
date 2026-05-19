@@ -1,62 +1,63 @@
-@extends('layouts.app')
-
+@extends('layouts.guru')
 @section('content')
 <h1 class="page-title">Dashboard</h1>
 
-{{-- Grid Kartu --}}
+@if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+@endif
+
 <div class="grid grid-cols-2 gap-4 mb-6">
 
-    {{-- Siswa --}}
     <div class="bg-[#3498db] text-white rounded-xl p-5 flex items-center justify-between">
         <div>
             <div class="text-4xl font-bold">{{ $total_siswa }}</div>
-            <div class="text-sm opacity-85 mt-1">Siswa</div>
-            <a href="{{ route('siswa.index') }}" class="text-white/70 text-xs no-underline">Lihat detail &rsaquo;</a>
+            <div class="text-sm mt-1 opacity-80">Siswa</div>
+            <a href="{{ route('guru.siswa.index') }}" class="text-white/70 text-xs no-underline">Lihat detail &rsaquo;</a>
         </div>
         <i class="fa fa-user-graduate text-5xl opacity-25"></i>
     </div>
 
-    {{-- Guru --}}
     <div class="bg-[#f39c12] text-white rounded-xl p-5 flex items-center justify-between">
         <div>
             <div class="text-4xl font-bold">{{ $total_guru }}</div>
-            <div class="text-sm opacity-85 mt-1">Guru</div>
-            <a href="{{ route('guru.index') }}" class="text-white/70 text-xs no-underline">Lihat detail &rsaquo;</a>
+            <div class="text-sm mt-1 opacity-80">Guru</div>
+            <span class="text-white/70 text-xs">Lihat detail &rsaquo;</span>
         </div>
         <i class="fa fa-users text-5xl opacity-25"></i>
     </div>
 
-    {{-- Mata Pelajaran --}}
+    <div class="bg-[#27ae60] text-white rounded-xl p-5 flex items-center justify-between">
+        <div>
+            <div class="text-4xl font-bold">{{ $total_ekskul }}</div>
+            <div class="text-sm mt-1 opacity-80">Ekstrakurikuler</div>
+            <span class="text-white/70 text-xs">Lihat detail &rsaquo;</span>
+        </div>
+        <i class="fa fa-running text-5xl opacity-25"></i>
+    </div>
+
     <div class="bg-[#e74c3c] text-white rounded-xl p-5 flex items-center justify-between">
         <div>
             <div class="text-4xl font-bold">{{ $total_mapel }}</div>
-            <div class="text-sm opacity-85 mt-1">Mata Pelajaran</div>
-            <a href="{{ route('mapel.index') }}" class="text-white/70 text-xs no-underline">Lihat detail &rsaquo;</a>
+            <div class="text-sm mt-1 opacity-80">Mata Pelajaran</div>
+            <span class="text-white/70 text-xs">Lihat detail &rsaquo;</span>
         </div>
         <i class="fa fa-book text-5xl opacity-25"></i>
     </div>
 
-    {{-- Kelas --}}
     <div class="bg-[#95a5a6] text-white rounded-xl p-5 flex items-center justify-between">
         <div>
             <div class="text-4xl font-bold">{{ $total_kelas }}</div>
-            <div class="text-sm opacity-85 mt-1">Kelas</div>
-            <a href="{{ route('kelas.index') }}" class="text-white/70 text-xs no-underline">Lihat detail &rsaquo;</a>
+            <div class="text-sm mt-1 opacity-80">Kelas</div>
+            <span class="text-white/70 text-xs">Lihat detail &rsaquo;</span>
         </div>
         <i class="fa fa-door-open text-5xl opacity-25"></i>
     </div>
 
-    {{-- Penilaian Selesai --}}
-    @php
-        $persen = ($total_siswa > 0 && $total_mapel > 0)
-            ? round(($nilai_sudah_diinput ?? 0) / ($total_siswa * $total_mapel) * 100)
-            : 53;
-    @endphp
     <div class="bg-[#17a2b8] text-white rounded-xl p-5 flex items-center justify-between">
         <div>
             <div class="text-4xl font-bold">{{ $persen }}%</div>
-            <div class="text-sm opacity-85 mt-1">Penilaian Selesai</div>
-            <a href="{{ route('nilai.index') }}" class="text-white/70 text-xs no-underline">Lihat detail &rsaquo;</a>
+            <div class="text-sm mt-1 opacity-80">Penilaian Selesai</div>
+            <span class="text-white/70 text-xs">Lihat detail &rsaquo;</span>
         </div>
         <i class="fa fa-check-circle text-5xl opacity-25"></i>
     </div>
@@ -69,7 +70,6 @@
         <span class="bg-[#27ae60] text-white px-3 py-1 rounded text-sm font-semibold">
             <i class="fa fa-bullhorn"></i> Informasi
         </span>
-        <span class="text-sm text-[#3498db] cursor-pointer">+ Informasi</span>
     </div>
     <div class="card-body" style="padding:0;">
         <div class="flex gap-3 items-start px-5 py-4 border-b border-gray-100">
@@ -78,13 +78,9 @@
             </div>
             <div>
                 <div class="text-sm font-semibold text-[#2c3e50]">{{ auth()->user()->name }}</div>
-                <div class="text-xs text-gray-400">Tolong segera perbaiki data siswa!</div>
-                <div class="mt-2">
-                    <span class="bg-gray-100 text-[#2c3e50] px-3 py-1 rounded text-xs cursor-pointer">Lihat detail</span>
-                </div>
+                <div class="text-xs text-gray-400 mt-1">Selamat datang di e-Raport MTs Rekayasa</div>
             </div>
         </div>
     </div>
 </div>
-
 @endsection
