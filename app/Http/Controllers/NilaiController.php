@@ -46,12 +46,18 @@ class NilaiController extends Controller
             ->get()
             ->keyBy('siswa_id');
 
-        return view('admin.nilai.input', compact('pembelajaran', 'siswas', 'tapel', 'nilais'));
+        $view = auth()->user()->role === 'guru' ? 'nilai.input' : 'admin.nilai.input';
+
+        return view($view, compact('pembelajaran', 'siswas', 'tapel', 'nilais'));
     }
 
     public function simpan(Request $request)
     {
         $tapel = TahunPelajaran::aktif();
+
+        // Ambil mata_pelajaran_id dari pembelajaran_id ← PERBAIKAN
+        $pembelajaran = Pembelajaran::findOrFail($request->pembelajaran_id);
+        $mataPelajaranId = $pembelajaran->mata_pelajaran_id;
 
         foreach ($request->nilai as $siswaId => $data) {
             $np  = $data['pengetahuan']  ?? 0;
@@ -63,7 +69,7 @@ class NilaiController extends Controller
             Nilai::updateOrCreate(
                 [
                     'siswa_id'           => $siswaId,
-                    'mata_pelajaran_id'  => $request->mata_pelajaran_id,
+                    'mata_pelajaran_id'  => $mataPelajaranId, // ← PERBAIKAN
                     'tahun_pelajaran_id' => $tapel->id,
                 ],
                 [
@@ -79,4 +85,16 @@ class NilaiController extends Controller
 
         return back()->with('success', 'Nilai berhasil disimpan!');
     }
+    public function nilaiAkhirDetail($id)
+{
+    $kelas = Kelas::with(['waliKelas', 'tahunPelajaran', 'siswas'])->findOrFail($id);
+    $pembelajarans = Pembelajaran::with('mataPelajaran')
+        ->where('kelas_id', $id)
+        ->get();
+    $siswas = $kelas->siswas;
+    $nilais = Nilai::whereIn('siswa_id', $siswas->pluck('id'))
+        ->get()
+        ->groupBy('siswa_id');
+    return view('admin.nilai.akhir-detail', compact('kelas', 'pembelajarans', 'siswas', 'nilais'));
+}
 }

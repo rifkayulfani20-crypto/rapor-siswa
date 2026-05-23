@@ -7,11 +7,12 @@ use App\Models\Siswa;
 use App\Models\Kelas;
 use App\Models\Guru;
 use App\Models\MataPelajaran;
+use App\Models\Pembelajaran;
+use App\Models\Nilai;
 use Illuminate\Http\Request;
 
 class DashboardGuruController extends Controller
 {
-    // Helper: ambil data guru yang sedang login
     private function getGuruId()
     {
         $guru = Guru::where('user_id', auth()->id())->first();
@@ -122,8 +123,38 @@ class DashboardGuruController extends Controller
 
     public function catatanUpdate($kelas) { return back(); }
 
-    public function nilaiMapelIndex()  { return view('guru-panel.mapel.nilai'); }
+    public function nilaiMapelIndex()
+    {
+        $guruId = $this->getGuruId();
+        $pembelajarans = Pembelajaran::with(['mataPelajaran', 'kelas'])
+            ->where('guru_id', $guruId)
+            ->get();
+        return view('guru-panel.mapel.nilai', compact('pembelajarans'));
+    }
+
     public function nilaiEkskulIndex() { return view('guru-panel.ekskul.nilai'); }
-    public function nilaiAkhir()       { return view('guru-panel.nilaiakhir'); }
-    public function raport()           { return view('guru-panel.raport'); }
+
+    public function nilaiAkhir()
+    {
+        $guruId = $this->getGuruId();
+        $pembelajarans = Kelas::with(['waliKelas', 'tahunPelajaran'])
+            ->where('wali_kelas_id', $guruId)
+            ->get();
+        return view('guru-panel.nilaiakhir', compact('pembelajarans'));
+    }
+
+    public function nilaiAkhirDetail($id)
+    {
+        $kelas = Kelas::with(['waliKelas', 'tahunPelajaran', 'siswas'])->findOrFail($id);
+        $pembelajarans = Pembelajaran::with('mataPelajaran')
+            ->where('kelas_id', $id)
+            ->get();
+        $siswas = $kelas->siswas;
+        $nilais = Nilai::whereIn('siswa_id', $siswas->pluck('id'))
+            ->get()
+            ->groupBy('siswa_id');
+        return view('guru-panel.nilaiakhir-detail', compact('kelas', 'pembelajarans', 'siswas', 'nilais'));
+    }
+
+    public function raport() { return view('guru-panel.raport'); }
 }

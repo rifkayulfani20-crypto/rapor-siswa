@@ -134,6 +134,7 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:admin,guru'])->group(function () {
         Route::get('/admin/nilai', [NilaiController::class, 'index'])->name('nilai.index');
         Route::get('/admin/nilaiakhir', [NilaiController::class, 'nilaiAkhir'])->name('nilai.akhir');
+        Route::get('/admin/nilaiakhir/{kelas}', [NilaiController::class, 'nilaiAkhirDetail'])->name('nilai.akhir.detail'); // ← TAMBAH INI
         Route::get('/admin/nilai/{pembelajaran}/input', [NilaiController::class, 'input'])->name('nilai.input');
         Route::post('/admin/nilai/simpan', [NilaiController::class, 'simpan'])->name('nilai.simpan');
     });
@@ -171,12 +172,15 @@ Route::middleware(['auth'])->group(function () {
 
         // Guru Mapel
         Route::get('/nilaipelajaran', [DashboardGuruController::class, 'nilaiMapelIndex'])->name('mapel.nilai');
+        Route::get('/nilaipelajaran/{pembelajaran}/input', [NilaiController::class, 'input'])->name('mapel.nilai.input');
+        Route::post('/nilaipelajaran/simpan', [NilaiController::class, 'simpan'])->name('mapel.nilai.simpan');
 
         // Pembina Ekskul
         Route::get('/nilaieskul', [DashboardGuruController::class, 'nilaiEkskulIndex'])->name('ekskul.nilai');
 
         // Nilai Akhir & Raport
         Route::get('/nilaiakhir', [DashboardGuruController::class, 'nilaiAkhir'])->name('nilaiakhir');
+        Route::get('/nilaiakhir/{kelas}', [DashboardGuruController::class, 'nilaiAkhirDetail'])->name('nilaiakhir.detail');
         Route::get('/raport', [DashboardGuruController::class, 'raport'])->name('raport');
         Route::get('/datakelas/{kelas}/siswa', [DashboardGuruController::class, 'kelasSiswa'])->name('walikelas.kelas.siswa');
     });

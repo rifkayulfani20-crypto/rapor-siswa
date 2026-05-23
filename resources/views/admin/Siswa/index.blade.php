@@ -54,12 +54,12 @@
                     <tr>
                         <td>{{ $siswas->firstItem() + $i }}</td>
                         <td>{{ $siswa->nama }}</td>
-                        <td>{{ $siswa->kelas->nama_kelas ?? '-' }}</td>
+                        <td>{{ $siswa->kelas->nama ?? '-' }}</td>
                         <td>{{ $siswa->nis }}</td>
                         <td>{{ $siswa->nisn }}</td>
                         <td>{{ $siswa->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' }}</td>
                         <td>{{ $siswa->tempat_lahir ?? '-' }}, {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->translatedFormat('j F Y') : '-' }}</td>
-                        <td>{{ $siswa->telepon ?? '-' }}</td>
+                        <td>{{ $siswa->no_hp_ortu ?? '-' }}</td>
                         <td>
                             <span class="badge {{ $siswa->status === 'Aktif' ? 'badge-success' : 'badge-danger' }}">
                                 {{ strtoupper($siswa->status) }}

@@ -13,7 +13,6 @@
 </head>
 <body class="bg-white p-8 text-gray-800">
 
-<!-- Print Button -->
 <div class="no-print mb-4 flex gap-3">
     <button onclick="window.print()"
             class="bg-red-500 text-white px-5 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-red-600">
@@ -24,11 +23,10 @@
     </a>
 </div>
 
-<!-- Raport Header -->
 <div class="border-2 border-gray-800 p-6 max-w-4xl mx-auto">
     <div class="text-center border-b-2 border-gray-800 pb-4 mb-4">
-        <h1 class="text-xl font-bold uppercase">RAPOR PESERTA DIDIK</h1>
-        <h2 class="text-lg font-bold">MTs Rekayasa</h2>
+        <h1 class="text-xl font-bold uppercase">SISTEM PENGOLAHAN RAPOR SISWA</h1>
+        <h2 class="text-lg font-bold">peserta didik</h2>
         <p class="text-sm">Tahun Pelajaran: {{ $tapel?->nama }} Semester {{ $tapel?->semester }}</p>
     </div>
 
@@ -48,16 +46,15 @@
         </div>
     </div>
 
-    <!-- Nilai Table -->
     <table class="w-full border-collapse text-sm">
         <thead>
             <tr class="bg-gray-800 text-white">
                 <th class="border border-gray-600 px-3 py-2 text-left">No</th>
                 <th class="border border-gray-600 px-3 py-2 text-left">Mata Pelajaran</th>
                 <th class="border border-gray-600 px-3 py-2 text-center">KKM</th>
-                <th class="border border-gray-600 px-3 py-2 text-center">Nilai Harian</th>
-                <th class="border border-gray-600 px-3 py-2 text-center">UTS</th>
-                <th class="border border-gray-600 px-3 py-2 text-center">UAS</th>
+                <th class="border border-gray-600 px-3 py-2 text-center">Pengetahuan</th>
+                <th class="border border-gray-600 px-3 py-2 text-center">PTS</th>
+                <th class="border border-gray-600 px-3 py-2 text-center">PAS</th>
                 <th class="border border-gray-600 px-3 py-2 text-center">Nilai Akhir</th>
                 <th class="border border-gray-600 px-3 py-2 text-center">Predikat</th>
             </tr>
@@ -74,11 +71,11 @@
                 <td class="border border-gray-300 px-3 py-1.5">{{ $i+1 }}</td>
                 <td class="border border-gray-300 px-3 py-1.5">{{ $nilai->mataPelajaran->nama }}</td>
                 <td class="border border-gray-300 px-3 py-1.5 text-center">{{ $kkm }}</td>
-                <td class="border border-gray-300 px-3 py-1.5 text-center">{{ $nilai->nilai_harian }}</td>
-                <td class="border border-gray-300 px-3 py-1.5 text-center">{{ $nilai->nilai_uts }}</td>
-                <td class="border border-gray-300 px-3 py-1.5 text-center">{{ $nilai->nilai_uas }}</td>
+                <td class="border border-gray-300 px-3 py-1.5 text-center">{{ $nilai->nilai_pengetahuan ?? '-' }}</td>
+                <td class="border border-gray-300 px-3 py-1.5 text-center">{{ $nilai->nilai_pts ?? '-' }}</td>
+                <td class="border border-gray-300 px-3 py-1.5 text-center">{{ $nilai->nilai_pas ?? '-' }}</td>
                 <td class="border border-gray-300 px-3 py-1.5 text-center font-semibold
-                           {{ $lulus ? 'text-green-700' : 'text-red-600' }}">
+                        {{ $lulus ? 'text-green-700' : 'text-red-600' }}">
                     {{ number_format($na, 1) }}
                 </td>
                 <td class="border border-gray-300 px-3 py-1.5 text-center font-bold">{{ $predikat }}</td>
@@ -91,7 +88,6 @@
         </tbody>
     </table>
 
-    <!-- TTD -->
     <div class="grid grid-cols-2 gap-8 mt-10 text-sm">
         <div class="text-center">
             <p>Mengetahui,</p>
