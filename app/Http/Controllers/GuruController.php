@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\Hash;
 class GuruController extends Controller {
     public function index() {
         $gurus = Guru::with('user')->latest()->paginate(15);
-        return view('guru.index', compact('gurus'));
+        return view('admin.guru.index', compact('gurus'));
     }
 
-    public function create() { return view('guru.form'); }
+    public function create() { return view('admin.guru.form'); }
 
     public function store(Request $request) {
         $request->validate([
@@ -45,7 +45,7 @@ class GuruController extends Controller {
         return redirect()->route('guru.index')->with('success', 'Data guru berhasil ditambahkan!');
     }
 
-    public function edit(Guru $guru) { return view('guru.form', compact('guru')); }
+    public function edit(Guru $guru) { return view('admin.guru.form', compact('guru')); }
 
     public function update(Request $request, Guru $guru) {
         $request->validate([

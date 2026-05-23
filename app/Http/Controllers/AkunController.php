@@ -10,12 +10,12 @@ class AkunController extends Controller
     public function index()
     {
         $akuns = User::latest()->paginate(10);
-        return view('akun.index', compact('akuns'));
+        return view('admin.akun.index', compact('akuns'));
     }
 
     public function edit(User $akun)
     {
-        return view('akun.form', compact('akun'));
+        return view('admin.akun.form', compact('akun'));
     }
 
     public function update(Request $request, User $akun)

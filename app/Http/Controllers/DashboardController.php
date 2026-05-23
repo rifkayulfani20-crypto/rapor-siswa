@@ -17,6 +17,7 @@ class DashboardController extends Controller
         $tapel = TahunPelajaran::aktif();
         $user  = auth()->user();
 
+        // ── Dashboard ADMIN ──────────────────────────────
         if ($user->isAdmin()) {
             return view('dashboard.index', [
                 'tapel'       => $tapel,
@@ -27,7 +28,7 @@ class DashboardController extends Controller
             ]);
         }
 
-        // ── Dashboard Guru ──────────────────────────────
+        // ── Dashboard GURU ──────────────────────────────
         $guruModel = $user->guru;
 
         $pembelajaran = Pembelajaran::with(['mataPelajaran', 'kelas'])
@@ -35,13 +36,11 @@ class DashboardController extends Controller
             ->where('status', 'Aktif')
             ->get();
 
-        // Hitung total siswa unik yang diajar
         $kelasIds = $pembelajaran->pluck('kelas_id')->unique();
         $totalSiswaDiajar = Siswa::whereIn('kelas_id', $kelasIds)
             ->where('status', 'Aktif')
             ->count();
 
-        // Hitung nilai yang sudah diinput oleh guru ini
         $mapelIds = $pembelajaran->pluck('mata_pelajaran_id')->unique();
         $siswaIds = Siswa::whereIn('kelas_id', $kelasIds)->where('status', 'Aktif')->pluck('id');
         $nilaiSudahDiinput = Nilai::whereIn('mata_pelajaran_id', $mapelIds)
@@ -49,18 +48,7 @@ class DashboardController extends Controller
             ->where('tahun_pelajaran_id', $tapel?->id)
             ->count();
 
-        return view('dashboard.index', [
-            'tapel'                => $tapel,
-            'pembelajaran'         => $pembelajaran,
-            'total_pembelajaran'   => $pembelajaran->count(),
-            'total_siswa_diajar'   => $totalSiswaDiajar,
-            'total_kelas_diajar'   => $kelasIds->count(),
-            'nilai_sudah_diinput'  => $nilaiSudahDiinput,
-            // admin vars biar tidak error jika blade memakai admin section
-            'total_siswa'          => 0,
-            'total_guru'           => 0,
-            'total_kelas'          => 0,
-            'total_mapel'          => 0,
-        ]);
+        // Redirect ke dashboard guru dengan layout guru
+        return redirect()->route('guru.dashboard');
     }
 }

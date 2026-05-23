@@ -10,12 +10,12 @@ class AdminController extends Controller
     public function index()
     {
         $admins = User::where('role', 'admin')->latest()->paginate(10);
-        return view('admin.index', compact('admins'));
+        return view('admin.data-admin.index', compact('admins'));
     }
 
     public function create()
     {
-        return view('admin.form');
+        return view('admin.data-admin.form');
     }
 
     public function store(Request $request)
@@ -39,7 +39,7 @@ class AdminController extends Controller
 
     public function edit(User $user)
     {
-        return view('admin.form', compact('user'));
+        return view('admin.data-admin.form', compact('user'));
     }
 
     public function update(Request $request, User $user)

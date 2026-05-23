@@ -6,10 +6,10 @@ use Illuminate\Http\Request;
 class KelasController extends Controller {
     public function index() {
         $kelas = Kelas::with(['waliKelas','tahunPelajaran'])->withCount('siswas')->paginate(15);
-        return view('kelas.index', compact('kelas'));
+        return view('admin.kelas.index', compact('kelas'));
     }
     public function create() {
-        return view('kelas.form', ['gurus'=>Guru::orderBy('nama')->get(),'tapels'=>TahunPelajaran::orderByDesc('id')->get(),'kelas'=>null]);
+        return view('admin.kelas.form', ['gurus'=>Guru::orderBy('nama')->get(),'tapels'=>TahunPelajaran::orderByDesc('id')->get(),'kelas'=>null]);
     }
     public function store(Request $request) {
         $request->validate(['nama'=>'required','tingkat'=>'required','tahun_pelajaran_id'=>'required|exists:tahun_pelajarans,id']);
@@ -17,7 +17,7 @@ class KelasController extends Controller {
         return redirect()->route('kelas.index')->with('success','Data kelas berhasil ditambahkan!');
     }
     public function edit(Kelas $kelas) {
-        return view('kelas.form', ['gurus'=>Guru::orderBy('nama')->get(),'tapels'=>TahunPelajaran::orderByDesc('id')->get(),'kelas'=>$kelas]);
+        return view('admin.kelas.form', ['gurus'=>Guru::orderBy('nama')->get(),'tapels'=>TahunPelajaran::orderByDesc('id')->get(),'kelas'=>$kelas]);
     }
     public function update(Request $request, Kelas $kelas) {
         $request->validate(['nama'=>'required','tingkat'=>'required','tahun_pelajaran_id'=>'required']);

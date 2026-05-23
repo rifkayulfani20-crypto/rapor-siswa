@@ -169,10 +169,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/catatan/{kelas}/edit', [DashboardGuruController::class, 'catatanEdit'])->name('walikelas.catatan.edit');
         Route::put('/catatan/{kelas}', [DashboardGuruController::class, 'catatanUpdate'])->name('walikelas.catatan.update');
 
-        Route::get('/prestasi', [DashboardGuruController::class, 'prestasiIndex'])->name('walikelas.prestasi');
-        Route::get('/prestasi/{kelas}/edit', [DashboardGuruController::class, 'prestasiEdit'])->name('walikelas.prestasi.edit');
-        Route::put('/prestasi/{kelas}', [DashboardGuruController::class, 'prestasiUpdate'])->name('walikelas.prestasi.update');
-
         // Guru Mapel
         Route::get('/nilaipelajaran', [DashboardGuruController::class, 'nilaiMapelIndex'])->name('mapel.nilai');
 
@@ -182,5 +178,6 @@ Route::middleware(['auth'])->group(function () {
         // Nilai Akhir & Raport
         Route::get('/nilaiakhir', [DashboardGuruController::class, 'nilaiAkhir'])->name('nilaiakhir');
         Route::get('/raport', [DashboardGuruController::class, 'raport'])->name('raport');
+        Route::get('/datakelas/{kelas}/siswa', [DashboardGuruController::class, 'kelasSiswa'])->name('walikelas.kelas.siswa');
     });
 });

@@ -3,61 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login – sistem pengolahan rapor siswa </title>
+    <title>Login – Sistem Pengolahan Rapor Siswa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #1a252f 0%, #2c3e50 60%, #3498db 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: #fff; border-radius: 12px; padding: 40px 36px; width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        .login-header { text-align: center; margin-bottom: 28px; }
-        .login-logo { width: 64px; height: 64px; background: #3498db; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px; }
-        .login-logo i { color: white; font-size: 28px; }
-        .login-title { font-size: 20px; font-weight: 700; color: #2c3e50; }
-        .login-subtitle { font-size: 13px; color: #7f8c8d; margin-top: 4px; }
-        .form-group { margin-bottom: 18px; }
-        .form-label { display: block; font-size: 13px; font-weight: 600; color: #2c3e50; margin-bottom: 6px; }
-        .input-group { position: relative; }
-        .input-group i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #7f8c8d; font-size: 14px; }
-        .form-control { width: 100%; padding: 10px 12px 10px 38px; border: 1.5px solid #ddd; border-radius: 6px; font-size: 14px; transition: border 0.2s; }
-        .form-control:focus { outline: none; border-color: #3498db; }
-        .is-invalid { border-color: #e74c3c !important; }
-        .invalid-feedback { color: #e74c3c; font-size: 11px; margin-top: 4px; display: block; }
-        .btn-login { width: 100%; padding: 11px; background: #3498db; color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-        .btn-login:hover { background: #2980b9; }
-        .footer-text { text-align: center; font-size: 11px; color: #bdc3c7; margin-top: 20px; }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<div class="login-box">
-    <div class="login-header">
-        <div class="login-logo"><i class="fa fa-graduation-cap"></i></div>
-        <div class="login-title">sistem pengolahan rapor siswa</div>
-        <div class="login-subtitle">Silakan masuk untuk melanjutkan</div>
+<body class="min-h-screen flex items-center justify-content-center bg-gradient-to-br from-slate-900 via-slate-700 to-blue-500 flex justify-center">
+
+<div class="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-md mx-4">
+
+    {{-- Header --}}
+    <div class="text-center mb-7">
+        <div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
+            <i class="fas fa-graduation-cap text-white text-2xl"></i>
+        </div>
+        <h1 class="text-lg font-bold text-slate-800">sistem pengolahan rapor siswa</h1>
+        <p class="text-sm text-slate-400 mt-1">Silakan masuk untuk melanjutkan</p>
     </div>
+
+    {{-- Error --}}
+    @if($errors->any())
+        <div class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-lg mb-4">
+            <i class="fas fa-exclamation-circle"></i> {{ $errors->first() }}
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-lg mb-4">
+            <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+        </div>
+    @endif
 
     <form method="POST" action="{{ route('login') }}">
         @csrf
-        <div class="form-group">
-            <label class="form-label">Email</label>
-            <div class="input-group">
-                <i class="fa fa-envelope"></i>
-                <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
-                       value="{{ old('email') }}" placeholder="admin@example.com" required>
+        <input type="hidden" name="role" id="input-role" value="">
+
+        {{-- Login Sebagai --}}
+        <div class="mb-4">
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Login Sebagai</label>
+            <div class="relative">
+                <i class="fas fa-users absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></i>
+                <select onchange="updateRole(this)"
+                    class="w-full pl-9 pr-9 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 appearance-none cursor-pointer">
+                    <option value="">-- Pilih Role --</option>
+                    <option value="admin"  {{ old('role') == 'admin'  ? 'selected' : '' }}>Admin</option>
+                    <option value="guru"   {{ old('role') == 'guru'   ? 'selected' : '' }}>Guru</option>
+                    <option value="siswa"  {{ old('role') == 'siswa'  ? 'selected' : '' }}>Siswa</option>
+                </select>
+                <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
             </div>
-            @error('email')<span class="invalid-feedback">{{ $message }}</span>@enderror
         </div>
 
-        <div class="form-group">
-            <label class="form-label">Password</label>
-            <div class="input-group">
-                <i class="fa fa-lock"></i>
-                <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+        {{-- Badge Role --}}
+        <div id="role-badge" class="hidden mb-4">
+            <span id="role-badge-inner" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold">
+                <i id="badge-icon" class="fas fa-shield-alt"></i>
+                <span id="badge-text">Admin</span>
+            </span>
+        </div>
+
+        {{-- Email --}}
+        <div class="mb-4">
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Email</label>
+            <div class="relative">
+                <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></i>
+                <input type="email" name="email"
+                    value="{{ old('email') }}"
+                    placeholder="contoh@email.com"
+                    required autofocus
+                    class="w-full pl-9 pr-4 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 @error('email') border-red-400 @enderror">
+            </div>
+            @error('email')
+                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
+        {{-- Password --}}
+        <div class="mb-6">
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
+            <div class="relative">
+                <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></i>
+                <input type="password" name="password" id="password"
+                    placeholder="••••••••"
+                    required
+                    class="w-full pl-9 pr-10 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400">
+                <button type="button" onclick="togglePw()"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-500 transition-colors">
+                    <i class="fas fa-eye text-sm" id="pw-icon"></i>
+                </button>
             </div>
         </div>
 
-        <button type="submit" class="btn-login"><i class="fa fa-sign-in-alt"></i> Masuk</button>
+        {{-- Submit --}}
+        <button type="submit"
+            class="w-full py-3 bg-blue-500 hover:bg-blue-600 active:scale-95 text-white font-semibold rounded-lg text-sm transition-all flex items-center justify-center gap-2">
+            <i class="fas fa-sign-in-alt"></i> Masuk
+        </button>
+
     </form>
-    <div class="footer-text">Copyright &copy; 2023 MTs Rekayasa</div>
+
+    <p class="text-center text-xs text-slate-300 mt-6">Copyright &copy; 2023 MTs Rekayasa</p>
+
 </div>
+
+<script>
+    const roleConfig = {
+        admin: { icon: 'fas fa-shield-alt',          label: 'Admin', color: 'text-blue-600',  bg: 'bg-blue-50'  },
+        guru:  { icon: 'fas fa-chalkboard-teacher',  label: 'Guru',  color: 'text-green-600', bg: 'bg-green-50' },
+        siswa: { icon: 'fas fa-user-graduate',       label: 'Siswa', color: 'text-orange-500',bg: 'bg-orange-50'},
+    };
+
+    function updateRole(select) {
+        const val = select.value;
+        const badge    = document.getElementById('role-badge');
+        const inner    = document.getElementById('role-badge-inner');
+        const iconEl   = document.getElementById('badge-icon');
+        const textEl   = document.getElementById('badge-text');
+
+        document.getElementById('input-role').value = val;
+
+        if (!val) { badge.classList.add('hidden'); return; }
+
+        const cfg = roleConfig[val];
+
+        // Reset classes
+        inner.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ' + cfg.bg + ' ' + cfg.color;
+        iconEl.className = cfg.icon + ' ' + cfg.color;
+        textEl.textContent = cfg.label;
+
+        badge.classList.remove('hidden');
+    }
+
+    function togglePw() {
+        const pw   = document.getElementById('password');
+        const icon = document.getElementById('pw-icon');
+        if (pw.type === 'password') {
+            pw.type = 'text';
+            icon.className = 'fas fa-eye-slash text-sm';
+        } else {
+            pw.type = 'password';
+            icon.className = 'fas fa-eye text-sm';
+        }
+    }
+
+    // Restore badge jika ada old('role')
+    const sel = document.querySelector('select');
+    if (sel && sel.value) updateRole(sel);
+</script>
+
 </body>
 </html>

@@ -25,13 +25,13 @@ class NilaiController extends Controller
                 ->get();
         }
 
-        return view('nilai.index', compact('pembelajaran'));
+        return view('admin.nilai.index', compact('pembelajaran'));
     }
 
     public function nilaiAkhir()
     {
         $kelas = Kelas::with(['waliKelas', 'tahunPelajaran'])->paginate(10);
-        return view('nilai.akhir', compact('kelas'));
+        return view('admin.nilai.akhir', compact('kelas'));
     }
 
     public function input(Pembelajaran $pembelajaran)
@@ -46,7 +46,7 @@ class NilaiController extends Controller
             ->get()
             ->keyBy('siswa_id');
 
-        return view('nilai.input', compact('pembelajaran', 'siswas', 'tapel', 'nilais'));
+        return view('admin.nilai.input', compact('pembelajaran', 'siswas', 'tapel', 'nilais'));
     }
 
     public function simpan(Request $request)
@@ -62,9 +62,9 @@ class NilaiController extends Controller
 
             Nilai::updateOrCreate(
                 [
-                    'siswa_id'          => $siswaId,
-                    'mata_pelajaran_id' => $request->mata_pelajaran_id,
-                    'tahun_pelajaran_id'=> $tapel->id,
+                    'siswa_id'           => $siswaId,
+                    'mata_pelajaran_id'  => $request->mata_pelajaran_id,
+                    'tahun_pelajaran_id' => $tapel->id,
                 ],
                 [
                     'nilai_pengetahuan'  => $np,

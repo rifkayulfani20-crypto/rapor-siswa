@@ -6,12 +6,12 @@ use Illuminate\Http\Request;
 class SiswaController extends Controller {
     public function index() {
         $siswas = Siswa::with('kelas')->latest()->paginate(15);
-        return view('siswa.index', compact('siswas'));
+        return view('admin.siswa.index', compact('siswas'));
     }
 
     public function create() {
         $kelas = Kelas::orderBy('nama')->get();
-        return view('siswa.form', compact('kelas'));
+        return view('admin.siswa.form', compact('kelas'));
     }
 
     public function store(Request $request) {
@@ -36,12 +36,12 @@ class SiswaController extends Controller {
 
     public function show(Siswa $siswa) {
         $siswa->load('kelas','nilais.mataPelajaran','kehadiran','prestasi','catatan');
-        return view('siswa.show', compact('siswa'));
+        return view('admin.siswa.show', compact('siswa'));
     }
 
     public function edit(Siswa $siswa) {
         $kelas = Kelas::orderBy('nama')->get();
-        return view('siswa.form', compact('siswa','kelas'));
+        return view('admin.siswa.form', compact('siswa','kelas'));
     }
 
     public function update(Request $request, Siswa $siswa) {
