@@ -28,9 +28,12 @@ class AuthController extends Controller
                 return redirect()->route('dashboard');
             } elseif ($role === 'guru') {
                 return redirect()->route('guru.dashboard');
-            } else {
-                return redirect()->route('login');
+            } elseif ($role === 'siswa') {
+                return redirect()->route('siswa.dashboard');
             }
+
+            Auth::logout();
+            return back()->withErrors(['email' => 'Role tidak dikenali.']);
         }
 
         return back()->withErrors(['email' => 'Email atau password salah.'])->onlyInput('email');

@@ -12,9 +12,9 @@
 
     <div class="py-2">
         <!-- Dashboard -->
-        <a href="{{ route('dashboard') }}"
+        <a href="{{ auth()->user()->isAdmin() ? route('dashboard') : route('guru.dashboard') }}"
            class="flex items-center gap-2 px-4 py-2 text-gray-300 hover:bg-white/10 hover:text-white text-sm transition
-                  {{ request()->routeIs('dashboard') ? 'bg-blue-600 text-white border-l-4 border-blue-300' : '' }}">
+                  {{ request()->routeIs('dashboard') || request()->routeIs('guru.dashboard') ? 'bg-blue-600 text-white border-l-4 border-blue-300' : '' }}">
             <i class="fas fa-tachometer-alt w-4"></i> Dashboard
         </a>
 
@@ -48,6 +48,11 @@
                    class="flex items-center gap-2 py-2 pl-10 pr-4 text-gray-400 hover:text-white hover:bg-white/5 text-sm transition">
                     <i class="fas fa-circle text-xs"></i> Data Mapel
                 </a>
+                <a href="{{ route('pembelajaran.index') }}"
+                   class="flex items-center gap-2 py-2 pl-10 pr-4 text-gray-400 hover:text-white hover:bg-white/5 text-sm transition
+                          {{ request()->routeIs('pembelajaran.*') ? 'text-white' : '' }}">
+                    <i class="fas fa-circle text-xs"></i> Data Pembelajaran
+                </a>
             </div>
         </div>
 
@@ -66,9 +71,11 @@
         @endif
 
         @if(auth()->user()->isGuru())
-        <a href="{{ route('nilai.index') }}"
-           class="flex items-center gap-2 px-4 py-2 text-gray-300 hover:bg-white/10 hover:text-white text-sm transition">
-            <i class="fas fa-pen w-4"></i> Input Nilai
+        <p class="px-4 py-2 text-xs text-white/30 uppercase tracking-widest font-semibold mt-2">Penilaian</p>
+        <a href="{{ route('guru.mapel.nilai') }}"
+           class="flex items-center gap-2 px-4 py-2 text-gray-300 hover:bg-white/10 hover:text-white text-sm transition
+                  {{ request()->routeIs('guru.mapel.*') ? 'bg-blue-600 text-white border-l-4 border-blue-300' : '' }}">
+            <i class="fas fa-pen w-4"></i> Input Nilai Pelajaran
         </a>
         @endif
 

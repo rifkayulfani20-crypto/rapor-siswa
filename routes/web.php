@@ -14,6 +14,7 @@ use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\AkunController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Guru\DashboardGuruController;
+use App\Http\Controllers\Siswa\DashboardSiswaController;
 use Illuminate\Support\Facades\Route;
 
 // Auth
@@ -134,7 +135,7 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:admin,guru'])->group(function () {
         Route::get('/admin/nilai', [NilaiController::class, 'index'])->name('nilai.index');
         Route::get('/admin/nilaiakhir', [NilaiController::class, 'nilaiAkhir'])->name('nilai.akhir');
-        Route::get('/admin/nilaiakhir/{kelas}', [NilaiController::class, 'nilaiAkhirDetail'])->name('nilai.akhir.detail'); // ← TAMBAH INI
+        Route::get('/admin/nilaiakhir/{kelas}', [NilaiController::class, 'nilaiAkhirDetail'])->name('nilai.akhir.detail');
         Route::get('/admin/nilai/{pembelajaran}/input', [NilaiController::class, 'input'])->name('nilai.input');
         Route::post('/admin/nilai/simpan', [NilaiController::class, 'simpan'])->name('nilai.simpan');
     });
@@ -142,17 +143,11 @@ Route::middleware(['auth'])->group(function () {
     // ==================== GURU ONLY ====================
     Route::middleware(['role:guru'])->prefix('guru')->name('guru.')->group(function () {
 
-        // Dashboard
         Route::get('/dashboard', [DashboardGuruController::class, 'index'])->name('dashboard');
-
-        // Profil Guru
         Route::get('/profil', [DashboardGuruController::class, 'profil'])->name('profil');
         Route::put('/profil', [DashboardGuruController::class, 'profilUpdate'])->name('profil.update');
-
-        // Siswa (lihat saja)
         Route::get('/siswa', [DashboardGuruController::class, 'siswaIndex'])->name('siswa.index');
 
-        // Wali Kelas
         Route::get('/datakelas', [DashboardGuruController::class, 'kelasIndex'])->name('walikelas.kelas');
         Route::get('/nilaisosial', [DashboardGuruController::class, 'nilaiSosialIndex'])->name('walikelas.nilaiSosial');
         Route::get('/nilaisosial/{kelas}/edit', [DashboardGuruController::class, 'nilaiSosialEdit'])->name('walikelas.nilaiSosial.edit');
@@ -170,18 +165,23 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/catatan/{kelas}/edit', [DashboardGuruController::class, 'catatanEdit'])->name('walikelas.catatan.edit');
         Route::put('/catatan/{kelas}', [DashboardGuruController::class, 'catatanUpdate'])->name('walikelas.catatan.update');
 
-        // Guru Mapel
         Route::get('/nilaipelajaran', [DashboardGuruController::class, 'nilaiMapelIndex'])->name('mapel.nilai');
         Route::get('/nilaipelajaran/{pembelajaran}/input', [NilaiController::class, 'input'])->name('mapel.nilai.input');
         Route::post('/nilaipelajaran/simpan', [NilaiController::class, 'simpan'])->name('mapel.nilai.simpan');
 
-        // Pembina Ekskul
         Route::get('/nilaieskul', [DashboardGuruController::class, 'nilaiEkskulIndex'])->name('ekskul.nilai');
-
-        // Nilai Akhir & Raport
         Route::get('/nilaiakhir', [DashboardGuruController::class, 'nilaiAkhir'])->name('nilaiakhir');
         Route::get('/nilaiakhir/{kelas}', [DashboardGuruController::class, 'nilaiAkhirDetail'])->name('nilaiakhir.detail');
         Route::get('/raport', [DashboardGuruController::class, 'raport'])->name('raport');
         Route::get('/datakelas/{kelas}/siswa', [DashboardGuruController::class, 'kelasSiswa'])->name('walikelas.kelas.siswa');
     });
+
+    // ==================== SISWA ONLY ====================
+    Route::middleware(['role:siswa'])->prefix('siswa')->name('siswa.')->group(function () {
+        Route::get('/dashboard', [DashboardSiswaController::class, 'dashboard'])->name('dashboard');
+        Route::get('/nilai',     [DashboardSiswaController::class, 'nilai'])->name('nilai');
+        Route::get('/raport',    [DashboardSiswaController::class, 'raport'])->name('raport');
+        Route::get('/profil',    [DashboardSiswaController::class, 'profil'])->name('profil');
+    });
+
 });
