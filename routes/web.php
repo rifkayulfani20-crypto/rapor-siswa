@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\SiswaController;
@@ -17,8 +18,10 @@ use App\Http\Controllers\Guru\DashboardGuruController;
 use App\Http\Controllers\Siswa\DashboardSiswaController;
 use Illuminate\Support\Facades\Route;
 
+// Landing Page
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
 // Auth
-Route::get('/', fn () => redirect()->route('login'));
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -173,6 +176,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/nilaiakhir', [DashboardGuruController::class, 'nilaiAkhir'])->name('nilaiakhir');
         Route::get('/nilaiakhir/{kelas}', [DashboardGuruController::class, 'nilaiAkhirDetail'])->name('nilaiakhir.detail');
         Route::get('/raport', [DashboardGuruController::class, 'raport'])->name('raport');
+        Route::get('/raport/cetak/{siswa}', [DashboardGuruController::class, 'raportCetak'])->name('raport.cetak');
         Route::get('/datakelas/{kelas}/siswa', [DashboardGuruController::class, 'kelasSiswa'])->name('walikelas.kelas.siswa');
     });
 

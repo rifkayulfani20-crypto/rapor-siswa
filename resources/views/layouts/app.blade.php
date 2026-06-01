@@ -6,33 +6,31 @@
     <title>Sistem Pengolahan Rapor Siswa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    {{-- Tailwind TANPA preflight agar tidak konflik dengan CSS lama --}}
     <script>
         tailwind.config = {
-            corePlugins: {
-                preflight: false
-            }
+            corePlugins: { preflight: false }
         }
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #ffffff; display: flex; min-height: 100vh; }
 
         /* Sidebar */
-        .sidebar { width: 220px; background: #2c3e50; color: #ecf0f1; display: flex; flex-direction: column; min-height: 100vh; position: fixed; top: 0; left: 0; z-index: 100; }
-        .sidebar-header { padding: 15px; background: #1a252f; display: flex; align-items: center; gap: 10px; }
-        .sidebar-header .logo { width: 36px; height: 36px; background: #3498db; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; }
-        .sidebar-header span { font-weight: bold; font-size: 14px; }
-        .sidebar-menu { flex: 1; padding: 10px 0; overflow-y: auto; }
-        .menu-label { font-size: 10px; text-transform: uppercase; color: #7f8c8d; padding: 12px 15px 4px; letter-spacing: 1px; }
-        .menu-item { display: flex; align-items: center; gap: 10px; padding: 10px 15px; color: #bdc3c7; text-decoration: none; font-size: 13px; cursor: pointer; transition: background 0.2s; border: none; background: none; width: 100%; text-align: left; }
-        .menu-item:hover, .menu-item.active { background: #3498db; color: #fff; }
+        .sidebar { width: 220px; background: #ffffff; color: #2c3e50; display: flex; flex-direction: column; min-height: 100vh; position: fixed; top: 0; left: 0; z-index: 100; border-right: 1px solid #e0e0e0; }
+        .sidebar-header { padding: 15px; background: #f5f5f5; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #e0e0e0; }
+        .sidebar-header .logo { width: 36px; height: 36px; background: #2c3e50; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; color: white; }
+        .sidebar-header span { font-weight: bold; font-size: 14px; color: #2c3e50; }
+        .sidebar-menu { flex: 1; padding: 10px 0; overflow-y: auto; background: #ffffff; }
+        .menu-label { font-size: 10px; text-transform: uppercase; color: #aaaaaa; padding: 12px 15px 4px; letter-spacing: 1px; }
+        .menu-item { display: flex; align-items: center; gap: 10px; padding: 10px 15px; color: #555555; text-decoration: none; font-size: 13px; cursor: pointer; transition: background 0.2s; border: none; background: none; width: 100%; text-align: left; }
+        .menu-item:hover, .menu-item.active { background: #2c3e50; color: #ffffff; }
         .menu-item i { width: 16px; text-align: center; }
-        .submenu { background: #243342; display: none; }
+        .submenu { background: #f9f9f9; display: none; border-left: 3px solid #2c3e50; }
         .submenu.open { display: block; }
-        .submenu .menu-item { padding-left: 35px; font-size: 12px; }
+        .submenu .menu-item { padding-left: 35px; font-size: 12px; color: #666666; }
+        .submenu .menu-item:hover, .submenu .menu-item.active { background: #2c3e50; color: #ffffff; }
         .menu-arrow { margin-left: auto; font-size: 10px; transition: transform 0.2s; }
         .menu-item.open .menu-arrow { transform: rotate(180deg); }
 
@@ -43,7 +41,7 @@
         .topbar-title { font-size: 15px; font-weight: 600; color: #2c3e50; }
         .topbar-right { display: flex; align-items: center; gap: 12px; }
         .user-name { font-size: 13px; font-weight: 600; color: #2c3e50; }
-        .avatar { width: 32px; height: 32px; background: #3498db; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: bold; }
+        .avatar { width: 32px; height: 32px; background: #2c3e50; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: bold; }
         .btn-logout { background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; text-decoration: none; }
         .btn-logout:hover { background: #c0392b; }
 
@@ -63,8 +61,8 @@
 
         /* Buttons */
         .btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: 5px; font-size: 13px; cursor: pointer; border: none; text-decoration: none; }
-        .btn-primary { background: #3498db; color: white; }
-        .btn-primary:hover { background: #2980b9; }
+        .btn-primary { background: #2c3e50; color: white; }
+        .btn-primary:hover { background: #1a252f; }
         .btn-success { background: #27ae60; color: white; }
         .btn-success:hover { background: #219a52; }
         .btn-warning { background: #f39c12; color: white; }
@@ -73,6 +71,7 @@
         .btn-danger:hover { background: #c0392b; }
         .btn-sm { padding: 4px 8px; font-size: 11px; }
         .btn-info { background: #17a2b8; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
 
         /* Table */
         .table-wrapper { overflow-x: auto; }
@@ -91,7 +90,7 @@
         .form-group { margin-bottom: 16px; }
         .form-label { display: block; font-size: 13px; font-weight: 600; color: #2c3e50; margin-bottom: 5px; }
         .form-control { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; transition: border 0.2s; }
-        .form-control:focus { outline: none; border-color: #3498db; box-shadow: 0 0 0 2px rgba(52,152,219,0.15); }
+        .form-control:focus { outline: none; border-color: #2c3e50; box-shadow: 0 0 0 2px rgba(44,62,80,0.15); }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .is-invalid { border-color: #e74c3c !important; }
         .invalid-feedback { color: #e74c3c; font-size: 11px; margin-top: 3px; }
@@ -99,13 +98,11 @@
         /* Pagination */
         .pagination { display: flex; gap: 4px; justify-content: center; margin-top: 20px; }
         .pagination a, .pagination span { padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; text-decoration: none; color: #2c3e50; }
-        .pagination .active span { background: #3498db; color: white; border-color: #3498db; }
+        .pagination .active span { background: #2c3e50; color: white; border-color: #2c3e50; }
 
         /* Search bar */
         .table-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
         .search-box { padding: 7px 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; width: 220px; }
-
-        /* Select per-page */
         .per-page { padding: 6px 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; }
 
         /* Footer */
@@ -129,7 +126,6 @@
 
         <div class="menu-label">Master Data</div>
 
-        <!-- BIODATA submenu -->
         <button class="menu-item {{ request()->routeIs('siswa.*','walisiswa.*','guru.*','admin.*','akun.*') ? 'active open' : '' }}"
                 onclick="toggleMenu('biodata')">
             <i class="fa fa-id-card"></i> Biodata
@@ -150,7 +146,6 @@
             </a>
         </div>
 
-        <!-- ADMINISTRASI submenu -->
         <button class="menu-item {{ request()->routeIs('tapel.*','kelas.*','mapel.*') ? 'active open' : '' }}"
                 onclick="toggleMenu('admin-menu')">
             <i class="fa fa-cogs"></i> Administrasi
@@ -168,7 +163,6 @@
             </a>
         </div>
 
-        <!-- PENILAIAN submenu -->
         <button class="menu-item {{ request()->routeIs('nilai.*','pembelajaran.*') ? 'active open' : '' }}"
                 onclick="toggleMenu('penilaian-menu')">
             <i class="fa fa-star"></i> Penilaian
@@ -225,7 +219,7 @@
     </div>
 
     <footer>
-        Copyright &copy; 2023 <a href="#">MTs Rekayasa</a>.
+        Copyright &copy; 2023 <a href="#">sistem pengolahan rapor siswa</a>.
     </footer>
 </div>
 

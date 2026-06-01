@@ -56,6 +56,7 @@
                     </thead>
                     <tbody>
                         @forelse($kelas->siswas as $i => $siswa)
+                        @php $hadir = $ketidakhadiranData[$siswa->id] ?? null; @endphp
                         <tr>
                             <td>{{ $i + 1 }}</td>
                             <td>{{ $siswa->nis }}</td>
@@ -64,21 +65,18 @@
                             <td>
                                 <input type="hidden" name="siswa_id[]" value="{{ $siswa->id }}">
                                 <input type="number" name="sakit[]" min="0"
-                                       value="{{ old('sakit.'.$i, 0) }}"
-                                       class="form-control"
-                                       style="font-size:13px;">
+                                       value="{{ old('sakit.'.$i, $hadir->sakit ?? 0) }}"
+                                       class="form-control" style="font-size:13px;">
                             </td>
                             <td>
                                 <input type="number" name="izin[]" min="0"
-                                       value="{{ old('izin.'.$i, 0) }}"
-                                       class="form-control"
-                                       style="font-size:13px;">
+                                       value="{{ old('izin.'.$i, $hadir->izin ?? 0) }}"
+                                       class="form-control" style="font-size:13px;">
                             </td>
                             <td>
                                 <input type="number" name="tanpa_keterangan[]" min="0"
-                                       value="{{ old('tanpa_keterangan.'.$i, 0) }}"
-                                       class="form-control"
-                                       style="font-size:13px;">
+                                       value="{{ old('tanpa_keterangan.'.$i, $hadir->tanpa_keterangan ?? 0) }}"
+                                       class="form-control" style="font-size:13px;">
                             </td>
                         </tr>
                         @empty

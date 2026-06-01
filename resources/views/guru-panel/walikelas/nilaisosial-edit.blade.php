@@ -62,7 +62,7 @@
                             <td>{{ $siswa->jenis_kelamin }}</td>
                             <td>
                                 <input type="hidden" name="siswa_id[]" value="{{ $siswa->id }}">
-                                <select name="predikat[]" class="form-control" style="font-size:12px;padding:6px 8px;">
+                                <select name="predikat[]" class="form-control predikat-select" style="font-size:12px;padding:6px 8px;">
                                     <option value="">-- Pilih --</option>
                                     <option value="A (Sangat Baik)" {{ old('predikat.'.$i) == 'A (Sangat Baik)' ? 'selected' : '' }}>A (Sangat Baik)</option>
                                     <option value="B (Baik)"        {{ old('predikat.'.$i) == 'B (Baik)'        ? 'selected' : '' }}>B (Baik)</option>
@@ -71,7 +71,7 @@
                                 </select>
                             </td>
                             <td>
-                                <textarea name="deskripsi[]" class="form-control" rows="3"
+                                <textarea name="deskripsi[]" class="form-control deskripsi-input" rows="3"
                                     style="font-size:12px;resize:vertical;"
                                     placeholder="Masukkan deskripsi">{{ old('deskripsi.'.$i) }}</textarea>
                             </td>
@@ -98,5 +98,24 @@
         </form>
     </div>
 </div>
+
+<script>
+const deskripsiMap = {
+    'A (Sangat Baik)'      : 'Peserta didik menunjukkan sikap sosial yang sangat baik, mampu bekerja sama, peduli, dan bertanggung jawab dalam kehidupan sehari-hari.',
+    'B (Baik)'             : 'Peserta didik menunjukkan sikap sosial yang baik, cukup mampu bekerja sama dan bertanggung jawab dalam kehidupan sehari-hari.',
+    'C (Cukup)'            : 'Peserta didik menunjukkan sikap sosial yang cukup, perlu bimbingan lebih lanjut dalam bekerja sama dan bertanggung jawab.',
+    'D (Perlu Bimbingan)'  : 'Peserta didik menunjukkan sikap sosial yang kurang, perlu perhatian dan bimbingan intensif dari guru dan orang tua.',
+};
+
+document.querySelectorAll('.predikat-select').forEach(function(select) {
+    select.addEventListener('change', function() {
+        const row      = this.closest('tr');
+        const textarea = row.querySelector('.deskripsi-input');
+        if (textarea) {
+            textarea.value = deskripsiMap[this.value] || '';
+        }
+    });
+});
+</script>
 
 @endsection

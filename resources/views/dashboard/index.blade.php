@@ -7,7 +7,7 @@
 <div class="grid grid-cols-2 gap-4 mb-6">
 
     {{-- Siswa --}}
-    <div class="bg-[#3498db] text-white rounded-xl p-5 flex items-center justify-between">
+    <div class="bg-[#1e3a5f] text-white rounded-xl p-5 flex items-center justify-between">
         <div>
             <div class="text-4xl font-bold">{{ $total_siswa }}</div>
             <div class="text-sm opacity-85 mt-1">Siswa</div>
@@ -17,7 +17,7 @@
     </div>
 
     {{-- Guru --}}
-    <div class="bg-[#f39c12] text-white rounded-xl p-5 flex items-center justify-between">
+    <div class="bg-[#1a3353] text-white rounded-xl p-5 flex items-center justify-between">
         <div>
             <div class="text-4xl font-bold">{{ $total_guru }}</div>
             <div class="text-sm opacity-85 mt-1">Guru</div>
@@ -27,7 +27,7 @@
     </div>
 
     {{-- Mata Pelajaran --}}
-    <div class="bg-[#e74c3c] text-white rounded-xl p-5 flex items-center justify-between">
+    <div class="bg-[#162d47] text-white rounded-xl p-5 flex items-center justify-between">
         <div>
             <div class="text-4xl font-bold">{{ $total_mapel }}</div>
             <div class="text-sm opacity-85 mt-1">Mata Pelajaran</div>
@@ -37,7 +37,7 @@
     </div>
 
     {{-- Kelas --}}
-    <div class="bg-[#95a5a6] text-white rounded-xl p-5 flex items-center justify-between">
+    <div class="bg-[#122540] text-white rounded-xl p-5 flex items-center justify-between">
         <div>
             <div class="text-4xl font-bold">{{ $total_kelas }}</div>
             <div class="text-sm opacity-85 mt-1">Kelas</div>
@@ -52,7 +52,7 @@
             ? round(($nilai_sudah_diinput ?? 0) / ($total_siswa * $total_mapel) * 100)
             : 53;
     @endphp
-    <div class="bg-[#17a2b8] text-white rounded-xl p-5 flex items-center justify-between">
+    <div class="bg-[#0f1f36] text-white rounded-xl p-5 flex items-center justify-between">
         <div>
             <div class="text-4xl font-bold">{{ $persen }}%</div>
             <div class="text-sm opacity-85 mt-1">Penilaian Selesai</div>
@@ -63,28 +63,6 @@
 
 </div>
 
-{{-- Info Panel --}}
-<div class="card">
-    <div class="card-header">
-        <span class="bg-[#27ae60] text-white px-3 py-1 rounded text-sm font-semibold">
-            <i class="fa fa-bullhorn"></i> Informasi
-        </span>
-        <span class="text-sm text-[#3498db] cursor-pointer">+ Informasi</span>
-    </div>
-    <div class="card-body" style="padding:0;">
-        <div class="flex gap-3 items-start px-5 py-4 border-b border-gray-100">
-            <div class="w-9 h-9 bg-[#3498db] rounded-full flex items-center justify-center text-white shrink-0">
-                <i class="fa fa-envelope text-sm"></i>
-            </div>
-            <div>
-                <div class="text-sm font-semibold text-[#2c3e50]">{{ auth()->user()->name }}</div>
-                <div class="text-xs text-gray-400">Tolong segera perbaiki data siswa!</div>
-                <div class="mt-2">
-                    <span class="bg-gray-100 text-[#2c3e50] px-3 py-1 rounded text-xs cursor-pointer">Lihat detail</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 @endsection

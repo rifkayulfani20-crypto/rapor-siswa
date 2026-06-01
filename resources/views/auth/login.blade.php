@@ -100,8 +100,6 @@
 
     </form>
 
-    <p class="text-center text-xs text-slate-300 mt-6">Copyright &copy; 2023 MTs Rekayasa</p>
-
 </div>
 
 <script>

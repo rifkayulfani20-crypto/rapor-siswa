@@ -9,6 +9,8 @@ use App\Models\Guru;
 use App\Models\MataPelajaran;
 use App\Models\Pembelajaran;
 use App\Models\Nilai;
+use App\Models\SikapSiswa;
+use App\Models\Kehadiran;
 use Illuminate\Http\Request;
 
 class DashboardGuruController extends Controller
@@ -70,7 +72,24 @@ class DashboardGuruController extends Controller
         return view('guru-panel.walikelas.nilaisosial-edit', compact('kelas'));
     }
 
-    public function nilaiSosialUpdate($kelas) { return back(); }
+    public function nilaiSosialUpdate(Request $request, $kelas)
+    {
+        $kelasModel = Kelas::with('tahunPelajaran')->findOrFail($kelas);
+        foreach ($request->siswa_id as $i => $siswaId) {
+            SikapSiswa::updateOrCreate(
+                [
+                    'siswa_id'          => $siswaId,
+                    'kelas_id'          => $kelas,
+                    'tahun_pelajaran_id'=> $kelasModel->tahun_pelajaran_id,
+                ],
+                [
+                    'predikat_sosial'   => $request->predikat[$i] ?? null,
+                    'deskripsi_sosial'  => $request->deskripsi[$i] ?? null,
+                ]
+            );
+        }
+        return back()->with('success', 'Nilai sosial berhasil disimpan!');
+    }
 
     public function nilaiSpiritualIndex()
     {
@@ -87,7 +106,24 @@ class DashboardGuruController extends Controller
         return view('guru-panel.walikelas.nilaispiritual-edit', compact('kelas'));
     }
 
-    public function nilaiSpiritualUpdate($kelas) { return back(); }
+    public function nilaiSpiritualUpdate(Request $request, $kelas)
+    {
+        $kelasModel = Kelas::with('tahunPelajaran')->findOrFail($kelas);
+        foreach ($request->siswa_id as $i => $siswaId) {
+            SikapSiswa::updateOrCreate(
+                [
+                    'siswa_id'           => $siswaId,
+                    'kelas_id'           => $kelas,
+                    'tahun_pelajaran_id' => $kelasModel->tahun_pelajaran_id,
+                ],
+                [
+                    'predikat_spiritual'  => $request->predikat[$i] ?? null,
+                    'deskripsi_spiritual' => $request->deskripsi[$i] ?? null,
+                ]
+            );
+        }
+        return back()->with('success', 'Nilai spiritual berhasil disimpan!');
+    }
 
     public function ketidakhadiranIndex()
     {
@@ -101,10 +137,34 @@ class DashboardGuruController extends Controller
     public function ketidakhadiranEdit($kelas)
     {
         $kelas = Kelas::with(['waliKelas', 'tahunPelajaran', 'siswas'])->findOrFail($kelas);
-        return view('guru-panel.walikelas.ketidakhadiran-edit', compact('kelas'));
+        $ketidakhadiranData = Kehadiran::where('tahun_pelajaran_id', $kelas->tahun_pelajaran_id)
+                        ->whereIn('siswa_id', $kelas->siswas->pluck('id'))
+                        ->get()
+                        ->keyBy('siswa_id');
+        return view('guru-panel.walikelas.ketidakhadiran-edit', compact('kelas', 'ketidakhadiranData'));
     }
 
-    public function ketidakhadiranUpdate($kelas) { return back(); }
+    public function ketidakhadiranUpdate(Request $request, $kelas)
+    {
+        $kelasModel = Kelas::with(['tahunPelajaran', 'siswas'])->findOrFail($kelas);
+
+        foreach ($request->siswa_id as $i => $siswaId) {
+            Kehadiran::updateOrCreate(
+                [
+                    'siswa_id'           => $siswaId,
+                    'tahun_pelajaran_id' => $kelasModel->tahun_pelajaran_id,
+                ],
+                [
+                    'sakit'            => $request->sakit[$i] ?? 0,
+                    'izin'             => $request->izin[$i] ?? 0,
+                    'tanpa_keterangan' => $request->tanpa_keterangan[$i] ?? 0,
+                ]
+            );
+        }
+
+        return redirect()->route('guru.walikelas.ketidakhadiran.edit', $kelas)
+            ->with('success', 'Data ketidakhadiran berhasil disimpan!');
+    }
 
     public function catatanIndex()
     {
@@ -156,5 +216,46 @@ class DashboardGuruController extends Controller
         return view('guru-panel.nilaiakhir-detail', compact('kelas', 'pembelajarans', 'siswas', 'nilais'));
     }
 
-    public function raport() { return view('guru-panel.raport'); }
+    public function raport()
+    {
+        $guruId = $this->getGuruId();
+        $kelass = Kelas::with(['waliKelas', 'tahunPelajaran', 'siswas'])
+            ->where('wali_kelas_id', $guruId)
+            ->get();
+        return view('guru-panel.raport', compact('kelass'));
+    }
+
+    public function raportCetak(\App\Models\Siswa $siswa)
+    {
+        $tapel = \App\Models\TahunPelajaran::aktif();
+        $nilais = Nilai::with('mataPelajaran')
+            ->where('siswa_id', $siswa->id)
+            ->when($tapel, fn($q) => $q->where('tahun_pelajaran_id', $tapel->id))
+            ->get();
+        $sikap = SikapSiswa::where('siswa_id', $siswa->id)
+            ->when($tapel, fn($q) => $q->where('tahun_pelajaran_id', $tapel->id))
+            ->first();
+        $kehadiran = Kehadiran::where('siswa_id', $siswa->id)
+            ->when($tapel, fn($q) => $q->where('tahun_pelajaran_id', $tapel->id))
+            ->first();
+
+        // Hitung peringkat di kelas
+        $semuaSiswaKelas = Siswa::where('kelas_id', $siswa->kelas_id)->pluck('id');
+        $rataRataSiswa = [];
+        foreach ($semuaSiswaKelas as $sid) {
+            $avg = Nilai::where('siswa_id', $sid)
+                ->when($tapel, fn($q) => $q->where('tahun_pelajaran_id', $tapel->id))
+                ->avg('nilai_akhir');
+            $rataRataSiswa[$sid] = $avg ?? 0;
+        }
+        arsort($rataRataSiswa);
+        $peringkat  = array_search($siswa->id, array_keys($rataRataSiswa)) + 1;
+        $totalSiswa = count($rataRataSiswa);
+        $rataRata   = round($nilais->avg('nilai_akhir'), 2);
+
+        return view('guru-panel.raport-cetak', compact(
+            'siswa', 'tapel', 'nilais', 'sikap', 'kehadiran',
+            'peringkat', 'totalSiswa', 'rataRata'
+        ));
+    }
 }
