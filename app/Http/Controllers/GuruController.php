@@ -45,6 +45,11 @@ class GuruController extends Controller {
         return redirect()->route('guru.index')->with('success', 'Data guru berhasil ditambahkan!');
     }
 
+    public function show(Guru $guru) {
+        $guru->load('user');
+        return view('admin.guru.show', compact('guru'));
+    }
+
     public function edit(Guru $guru) { return view('admin.guru.form', compact('guru')); }
 
     public function update(Request $request, Guru $guru) {

@@ -7,7 +7,7 @@
 <div class="grid grid-cols-2 gap-4 mb-6">
 
     {{-- Siswa --}}
-    <div class="bg-[#1e3a5f] text-white rounded-xl p-5 flex items-center justify-between">
+    <div class="bg-[#1a3a6c] text-white rounded-xl p-5 flex items-center justify-between">
         <div>
             <div class="text-4xl font-bold">{{ $total_siswa }}</div>
             <div class="text-sm opacity-85 mt-1">Siswa</div>
@@ -17,7 +17,7 @@
     </div>
 
     {{-- Guru --}}
-    <div class="bg-[#1a3353] text-white rounded-xl p-5 flex items-center justify-between">
+    <div class="bg-[#1e4d8c] text-white rounded-xl p-5 flex items-center justify-between">
         <div>
             <div class="text-4xl font-bold">{{ $total_guru }}</div>
             <div class="text-sm opacity-85 mt-1">Guru</div>
@@ -27,7 +27,7 @@
     </div>
 
     {{-- Mata Pelajaran --}}
-    <div class="bg-[#162d47] text-white rounded-xl p-5 flex items-center justify-between">
+    <div class="bg-[#1a3a6c] text-white rounded-xl p-5 flex items-center justify-between">
         <div>
             <div class="text-4xl font-bold">{{ $total_mapel }}</div>
             <div class="text-sm opacity-85 mt-1">Mata Pelajaran</div>
@@ -37,7 +37,7 @@
     </div>
 
     {{-- Kelas --}}
-    <div class="bg-[#122540] text-white rounded-xl p-5 flex items-center justify-between">
+    <div class="bg-[#1e4d8c] text-white rounded-xl p-5 flex items-center justify-between">
         <div>
             <div class="text-4xl font-bold">{{ $total_kelas }}</div>
             <div class="text-sm opacity-85 mt-1">Kelas</div>
@@ -52,7 +52,7 @@
             ? round(($nilai_sudah_diinput ?? 0) / ($total_siswa * $total_mapel) * 100)
             : 53;
     @endphp
-    <div class="bg-[#0f1f36] text-white rounded-xl p-5 flex items-center justify-between">
+    <div class="bg-[#1a3a6c] text-white rounded-xl p-5 flex items-center justify-between">
         <div>
             <div class="text-4xl font-bold">{{ $persen }}%</div>
             <div class="text-sm opacity-85 mt-1">Penilaian Selesai</div>
@@ -62,7 +62,5 @@
     </div>
 
 </div>
-
-
 
 @endsection

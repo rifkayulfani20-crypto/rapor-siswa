@@ -8,46 +8,46 @@
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 
-<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:24px;">
+<div class="grid grid-cols-2 gap-4 mb-6">
 
-    {{-- Guru --}}
-    <div style="background:#1a3353; color:white; border-radius:10px; padding:20px; display:flex; align-items:center; justify-content:space-between;">
+    {{-- Guru (Profil) --}}
+    <div class="bg-[#1a3a6c] text-white rounded-xl p-5 flex items-center justify-between">
         <div>
-            <div style="font-size:18px; font-weight:700; line-height:1.3;">{{ auth()->user()->name }}</div>
-            <div style="font-size:13px; opacity:.85; margin-top:4px;">Guru</div>
-            <a href="{{ route('guru.profil') }}" style="color:rgba(255,255,255,.7); font-size:12px; text-decoration:none;">Lihat profil ›</a>
+            <div class="text-xl font-bold leading-snug">{{ auth()->user()->name }}</div>
+            <div class="text-sm opacity-85 mt-1">Guru</div>
+            <a href="{{ route('guru.profil') }}" class="text-white/70 text-xs no-underline mt-4 block">Lihat profil ›</a>
         </div>
-        <i class="fas fa-users" style="font-size:48px; opacity:.25;"></i>
+        <i class="fas fa-chalkboard-teacher text-5xl opacity-25"></i>
     </div>
 
     {{-- Mata Pelajaran --}}
-    <div style="background:#122540; color:white; border-radius:10px; padding:20px; display:flex; align-items:center; justify-content:space-between;">
+    <div class="bg-[#1e4d8c] text-white rounded-xl p-5 flex items-center justify-between">
         <div>
-            <div style="font-size:36px; font-weight:700;">{{ $total_mapel }}</div>
-            <div style="font-size:13px; opacity:.85; margin-top:4px;">Mata Pelajaran</div>
-            <a href="{{ route('guru.mapel.nilai') }}" style="color:rgba(255,255,255,.7); font-size:12px; text-decoration:none;">Lihat detail ›</a>
+            <div class="text-4xl font-bold">{{ $total_mapel }}</div>
+            <div class="text-sm opacity-85 mt-1">Mata Pelajaran</div>
+            <a href="{{ route('guru.mapel.nilai') }}" class="text-white/70 text-xs no-underline mt-4 block">Lihat detail ›</a>
         </div>
-        <i class="fas fa-book" style="font-size:48px; opacity:.25;"></i>
+        <i class="fas fa-book text-5xl opacity-25"></i>
     </div>
 
     {{-- Kelas --}}
-    <div style="background:#0f1f36; color:white; border-radius:10px; padding:20px; display:flex; align-items:center; justify-content:space-between;">
+    <div class="bg-[#1a3a6c] text-white rounded-xl p-5 flex items-center justify-between">
         <div>
-            <div style="font-size:36px; font-weight:700;">{{ $total_kelas }}</div>
-            <div style="font-size:13px; opacity:.85; margin-top:4px;">Kelas</div>
-            <a href="{{ route('guru.walikelas.kelas') }}" style="color:rgba(255,255,255,.7); font-size:12px; text-decoration:none;">Lihat detail ›</a>
+            <div class="text-4xl font-bold">{{ $total_kelas }}</div>
+            <div class="text-sm opacity-85 mt-1">Kelas</div>
+            <a href="{{ route('guru.walikelas.kelas') }}" class="text-white/70 text-xs no-underline mt-4 block">Lihat detail ›</a>
         </div>
-        <i class="fas fa-door-open" style="font-size:48px; opacity:.25;"></i>
+        <i class="fas fa-door-open text-5xl opacity-25"></i>
     </div>
 
     {{-- Penilaian Selesai --}}
-    <div style="background:#0a1628; color:white; border-radius:10px; padding:20px; display:flex; align-items:center; justify-content:space-between;">
+    <div class="bg-[#1e4d8c] text-white rounded-xl p-5 flex items-center justify-between">
         <div>
-            <div style="font-size:36px; font-weight:700;">{{ $persen }}%</div>
-            <div style="font-size:13px; opacity:.85; margin-top:4px;">Penilaian Selesai</div>
-            <a href="{{ route('guru.nilaiakhir') }}" style="color:rgba(255,255,255,.7); font-size:12px; text-decoration:none;">Lihat detail ›</a>
+            <div class="text-4xl font-bold">{{ $persen }}%</div>
+            <div class="text-sm opacity-85 mt-1">Penilaian Selesai</div>
+            <a href="{{ route('guru.nilaiakhir') }}" class="text-white/70 text-xs no-underline mt-4 block">Lihat detail ›</a>
         </div>
-        <i class="fas fa-check-circle" style="font-size:48px; opacity:.25;"></i>
+        <i class="fas fa-check-circle text-5xl opacity-25"></i>
     </div>
 
 </div>

@@ -30,6 +30,8 @@ class AuthController extends Controller
                 return redirect()->route('guru.dashboard');
             } elseif ($role === 'siswa') {
                 return redirect()->route('siswa.dashboard');
+            } elseif ($role === 'kepsek') {
+                return redirect()->route('kepsek.dashboard');
             }
 
             Auth::logout();

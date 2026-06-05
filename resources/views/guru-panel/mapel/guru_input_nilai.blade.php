@@ -41,6 +41,7 @@
             @csrf
             <input type="hidden" name="pembelajaran_id" value="{{ $pembelajaran->id }}">
             <input type="hidden" name="mata_pelajaran_id" value="{{ $pembelajaran->mata_pelajaran_id }}">
+            <input type="hidden" id="kkm-value" value="{{ $pembelajaran->mataPelajaran->kkm ?? 75 }}">
 
             <div class="table-wrapper">
                 <table>
@@ -125,44 +126,55 @@
 </div>
 
 <script>
+var kkm = parseFloat(document.getElementById('kkm-value').value) || 75;
+
 function getDeskripsi(na) {
     if (na >= 90) return 'Menunjukkan penguasaan materi yang sangat baik serta memiliki keterampilan yang sangat memuaskan dan membanggakan.';
     if (na >= 80) return 'Menunjukkan penguasaan materi yang baik serta memiliki keterampilan yang sangat memuaskan.';
-    if (na >= 70) return 'Menunjukkan penguasaan materi yang cukup baik serta memiliki keterampilan yang memuaskan.';
-    if (na >= 60) return 'Menunjukkan penguasaan materi yang cukup serta perlu meningkatkan keterampilan lebih lanjut.';
-    return 'Menunjukkan penguasaan materi yang masih perlu ditingkatkan dan memerlukan bimbingan lebih lanjut.';
+    if (na >= kkm) return 'Menunjukkan penguasaan materi yang cukup baik serta memiliki keterampilan yang memuaskan.';
+    if (na >= 60) return 'Menunjukkan penguasaan materi yang masih kurang dan perlu bimbingan lebih intensif untuk mencapai ketuntasan.';
+    return 'Menunjukkan penguasaan materi yang sangat kurang dan memerlukan bimbingan serta remedial segera.';
 }
 
 function hitungRow(siswaId) {
-    var p   = parseFloat(document.querySelector('input[name="nilai[' + siswaId + '][pengetahuan]"]').value) || 0;
-    var k   = parseFloat(document.querySelector('input[name="nilai[' + siswaId + '][keterampilan]"]').value) || 0;
-    var pts = parseFloat(document.querySelector('input[name="nilai[' + siswaId + '][pts]"]').value) || 0;
-    var pas = parseFloat(document.querySelector('input[name="nilai[' + siswaId + '][pas]"]').value) || 0;
-
-    var pFilled   = document.querySelector('input[name="nilai[' + siswaId + '][pengetahuan]"]').value.trim() !== '';
-    var kFilled   = document.querySelector('input[name="nilai[' + siswaId + '][keterampilan]"]').value.trim() !== '';
-    var ptsFilled = document.querySelector('input[name="nilai[' + siswaId + '][pts]"]').value.trim() !== '';
-    var pasFilled = document.querySelector('input[name="nilai[' + siswaId + '][pas]"]').value.trim() !== '';
-
-    var naEl   = document.getElementById('na-' + siswaId);
+    var pEl   = document.querySelector('input[name="nilai[' + siswaId + '][pengetahuan]"]');
+    var kEl   = document.querySelector('input[name="nilai[' + siswaId + '][keterampilan]"]');
+    var ptsEl = document.querySelector('input[name="nilai[' + siswaId + '][pts]"]');
+    var pasEl = document.querySelector('input[name="nilai[' + siswaId + '][pas]"]');
+    var naEl  = document.getElementById('na-' + siswaId);
     var deskEl = document.getElementById('desk-' + siswaId);
 
     if (!naEl || !deskEl) return;
 
+    var pFilled   = pEl.value.trim() !== '';
+    var kFilled   = kEl.value.trim() !== '';
+    var ptsFilled = ptsEl.value.trim() !== '';
+    var pasFilled = pasEl.value.trim() !== '';
+
     if (pFilled && kFilled && ptsFilled && pasFilled) {
-        var na = (p + k + pts + pas) / 4;
+        var p   = parseFloat(pEl.value) || 0;
+        var k   = parseFloat(kEl.value) || 0;
+        var pts = parseFloat(ptsEl.value) || 0;
+        var pas = parseFloat(pasEl.value) || 0;
+        var na  = (p + k + pts + pas) / 4;
+
         naEl.textContent = na.toFixed(2);
-        naEl.style.color = na >= 75 ? '#1e8449' : '#c0392b';
+        naEl.style.color = na >= kkm ? '#1e8449' : '#c0392b';
         deskEl.value = getDeskripsi(na);
-        deskEl.style.background = '#f0faf4';
-        deskEl.style.borderColor = '#2ecc71';
-    } else {
+        deskEl.style.background = na >= kkm ? '#f0faf4' : '#fdecea';
+        deskEl.style.borderColor = na >= kkm ? '#2ecc71' : '#e74c3c';
+    } else if (pFilled || kFilled || ptsFilled || pasFilled) {
         naEl.textContent = '...';
         naEl.style.color = '#e67e22';
+    } else {
+        naEl.textContent = '-';
+        naEl.style.color = '#2c3e50';
+        deskEl.style.background = '';
+        deskEl.style.borderColor = '';
     }
 }
 
-// Hitung saat halaman load jika nilai sudah ada
+// Hitung saat halaman load jika nilai sudah ada dari DB
 window.onload = function() {
     @foreach($siswas as $siswa)
     hitungRow('{{ $siswa->id }}');

@@ -128,4 +128,12 @@ class DatabaseSeeder extends Seeder
         WaliSiswa::create(['nama'=>'Herman',  'jenis_kelamin'=>'L','siswa_id'=>$siswas[5]->id,'sebagai'=>'Ayah','pekerjaan'=>'Petani',  'no_hp'=>'081234567890']);
         WaliSiswa::create(['nama'=>'Tasrifah','jenis_kelamin'=>'P','siswa_id'=>$siswas[2]->id,'sebagai'=>'Ayah','pekerjaan'=>'Pedagang','no_hp'=>'081234567891']);
     }
+
+    // database/seeders/UserSeeder.php (atau RoleSeeder)
+User::create([
+    'name'     => 'Kepala Sekolah',
+    'email'    => 'kepsek@sekolah.com',
+    'password' => bcrypt('password'),
+    'role'     => 'kepsek',
+]);
 }

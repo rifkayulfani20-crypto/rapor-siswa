@@ -44,9 +44,10 @@
                 <select onchange="updateRole(this)"
                     class="w-full pl-9 pr-9 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 appearance-none cursor-pointer">
                     <option value="">-- Pilih Role --</option>
-                    <option value="admin"  {{ old('role') == 'admin'  ? 'selected' : '' }}>Admin</option>
-                    <option value="guru"   {{ old('role') == 'guru'   ? 'selected' : '' }}>Guru</option>
-                    <option value="siswa"  {{ old('role') == 'siswa'  ? 'selected' : '' }}>Siswa</option>
+                    <option value="admin"   {{ old('role') == 'admin'   ? 'selected' : '' }}>Admin</option>
+                    <option value="guru"    {{ old('role') == 'guru'    ? 'selected' : '' }}>Guru</option>
+                    <option value="siswa"   {{ old('role') == 'siswa'   ? 'selected' : '' }}>Siswa</option>
+                    <option value="kepsek"  {{ old('role') == 'kepsek'  ? 'selected' : '' }}>Kepala Sekolah</option>
                 </select>
                 <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
             </div>
@@ -104,17 +105,18 @@
 
 <script>
     const roleConfig = {
-        admin: { icon: 'fas fa-shield-alt',          label: 'Admin', color: 'text-blue-600',  bg: 'bg-blue-50'  },
-        guru:  { icon: 'fas fa-chalkboard-teacher',  label: 'Guru',  color: 'text-green-600', bg: 'bg-green-50' },
-        siswa: { icon: 'fas fa-user-graduate',       label: 'Siswa', color: 'text-orange-500',bg: 'bg-orange-50'},
+        admin:  { icon: 'fas fa-shield-alt',         label: 'Admin',          color: 'text-blue-600',   bg: 'bg-blue-50'   },
+        guru:   { icon: 'fas fa-chalkboard-teacher', label: 'Guru',           color: 'text-green-600',  bg: 'bg-green-50'  },
+        siswa:  { icon: 'fas fa-user-graduate',      label: 'Siswa',          color: 'text-orange-500', bg: 'bg-orange-50' },
+        kepsek: { icon: 'fas fa-user-tie',           label: 'Kepala Sekolah', color: 'text-purple-600', bg: 'bg-purple-50' },
     };
 
     function updateRole(select) {
-        const val = select.value;
-        const badge    = document.getElementById('role-badge');
-        const inner    = document.getElementById('role-badge-inner');
-        const iconEl   = document.getElementById('badge-icon');
-        const textEl   = document.getElementById('badge-text');
+        const val   = select.value;
+        const badge = document.getElementById('role-badge');
+        const inner = document.getElementById('role-badge-inner');
+        const iconEl = document.getElementById('badge-icon');
+        const textEl = document.getElementById('badge-text');
 
         document.getElementById('input-role').value = val;
 
@@ -122,7 +124,6 @@
 
         const cfg = roleConfig[val];
 
-        // Reset classes
         inner.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ' + cfg.bg + ' ' + cfg.color;
         iconEl.className = cfg.icon + ' ' + cfg.color;
         textEl.textContent = cfg.label;

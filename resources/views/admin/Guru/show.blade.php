@@ -1,74 +1,83 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="page-title">Data Guru</div>
+<div class="page-title">Detail Guru</div>
 
-<div class="card" style="max-width:600px;margin:0 auto;">
-    <div class="card-header">
-        <span><i class="fa fa-user-tie"></i> Detail Data Guru</span>
-        <a href="{{ route('guru.index') }}" class="btn btn-warning btn-sm">
-            <i class="fa fa-arrow-left"></i> Kembali
-        </a>
-    </div>
-    <div class="card-body">
-
-        {{-- Avatar --}}
-        <div style="text-align:center;margin-bottom:24px;">
-            <div style="width:80px;height:80px;border-radius:50%;background:#dde4ea;display:inline-flex;align-items:center;justify-content:center;">
-                <i class="fa fa-user-tie" style="font-size:36px;color:#aab4be;"></i>
+<div style="max-width:720px;">
+    <div class="card">
+        <div class="card-header">
+            <span class="font-semibold text-gray-700" style="font-size:14px;">
+                <i class="fa fa-user-tie mr-1"></i> {{ $guru->nama }}
+            </span>
+            <div style="display:flex;gap:6px;">
+                <a href="{{ route('guru.edit', $guru->id) }}" class="btn btn-primary btn-sm">
+                    <i class="fa fa-edit"></i> Edit
+                </a>
+                <a href="{{ route('guru.index') }}" class="btn btn-secondary btn-sm">
+                    <i class="fa fa-arrow-left"></i> Kembali
+                </a>
             </div>
-            <div style="margin-top:8px;font-size:15px;font-weight:700;color:#2c3e50;">{{ $guru->nama }}</div>
-            <div style="font-size:12px;color:#7f8c8d;">{{ $guru->jabatan ?? 'Guru' }}</div>
         </div>
 
-        {{-- Detail Table --}}
-        <table style="width:100%;font-size:13px;border-collapse:collapse;">
-            @php
-                $rows = [
-                    ['Nama Lengkap',      $guru->nama],
-                    ['Jenis Kelamin',     $guru->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan'],
-                    ['NIP',              $guru->nip ?? '-'],
-                    ['NUPTK',            $guru->nuptk ?? '-'],
-                    ['Tempat, Tgl Lahir', ($guru->tempat_lahir ?? '-') . ', ' . ($guru->tanggal_lahir ? \Carbon\Carbon::parse($guru->tanggal_lahir)->translatedFormat('j F Y') : '-')],
-                    ['Agama',            $guru->agama ?? '-'],
-                    ['Alamat',           $guru->alamat ?? '-'],
-                    ['No. HP',           $guru->no_hp ?? '-'],
-                    ['Email',            $guru->user->email ?? '-'],
-                    ['Jabatan',          $guru->jabatan ?? '-'],
-                    ['Pendidikan',       $guru->pendidikan ?? '-'],
-                    ['Status',           $guru->status ?? 'Aktif'],
-                ];
-            @endphp
+        <div class="card-body" style="padding:16px 20px;">
 
-            @foreach($rows as $row)
-            <tr style="border-bottom:1px solid #f0f0f0;">
-                <td style="padding:9px 12px;font-weight:600;color:#2c3e50;width:45%;vertical-align:top;">
-                    {{ $row[0] }}
-                </td>
-                <td style="padding:9px 4px;color:#2c3e50;width:5%;">:</td>
-                <td style="padding:9px 12px;color:#555;vertical-align:top;">
-                    @if($row[0] === 'Status')
+            {{-- DATA PRIBADI --}}
+            <div style="font-size:11px;font-weight:600;color:#95a5a6;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">
+                Data Pribadi
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;margin-bottom:16px;">
+
+                @php
+                $fields = [
+                    ['label' => 'Nama Lengkap',      'value' => $guru->nama],
+                    ['label' => 'Jenis Kelamin',      'value' => $guru->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan'],
+                    ['label' => 'NIP',                'value' => $guru->nip ?? '-'],
+                    ['label' => 'NUPTK',              'value' => $guru->nuptk ?? '-'],
+                    ['label' => 'Tempat Lahir',       'value' => $guru->tempat_lahir ?? '-'],
+                    ['label' => 'Tanggal Lahir',      'value' => $guru->tanggal_lahir
+                        ? \Carbon\Carbon::parse($guru->tanggal_lahir)->translatedFormat('j F Y')
+                        : '-'],
+                    ['label' => 'No. HP',             'value' => $guru->no_hp ?? '-'],
+                    ['label' => 'Email',              'value' => $guru->user->email ?? '-'],
+                ];
+                @endphp
+
+                @foreach($fields as $f)
+                <div>
+                    <div style="font-size:11px;color:#95a5a6;margin-bottom:2px;">{{ $f['label'] }}</div>
+                    <div style="font-size:13px;font-weight:500;color:#2c3e50;">{{ $f['value'] }}</div>
+                </div>
+                @endforeach
+
+                <div style="grid-column:span 2;">
+                    <div style="font-size:11px;color:#95a5a6;margin-bottom:2px;">Alamat</div>
+                    <div style="font-size:13px;font-weight:500;color:#2c3e50;">{{ $guru->alamat ?? '-' }}</div>
+                </div>
+
+            </div>
+
+            <div style="border-top:1px solid #f0f0f0;margin-bottom:14px;"></div>
+
+            {{-- AKUN --}}
+            <div style="font-size:11px;font-weight:600;color:#95a5a6;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">
+                Info Akun
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;">
+                <div>
+                    <div style="font-size:11px;color:#95a5a6;margin-bottom:2px;">Role</div>
+                    <div style="font-size:13px;font-weight:500;color:#2c3e50;">{{ ucfirst($guru->user->role ?? '-') }}</div>
+                </div>
+                <div>
+                    <div style="font-size:11px;color:#95a5a6;margin-bottom:2px;">Status</div>
+                    <div>
                         <span class="badge {{ ($guru->status ?? 'Aktif') === 'Aktif' ? 'badge-success' : 'badge-danger' }}">
                             {{ strtoupper($guru->status ?? 'AKTIF') }}
                         </span>
-                    @else
-                        {{ $row[1] }}
-                    @endif
-                </td>
-            </tr>
-            @endforeach
-        </table>
+                    </div>
+                </div>
+            </div>
 
-        {{-- Tombol --}}
-        <div style="display:flex;gap:8px;margin-top:20px;justify-content:flex-end;">
-            <a href="{{ route('guru.edit', $guru->id) }}" class="btn btn-primary">
-                <i class="fa fa-edit"></i> Edit
-            </a>
-            <a href="{{ route('guru.index') }}" class="btn btn-warning">
-                <i class="fa fa-times"></i> Tutup
-            </a>
         </div>
-
     </div>
 </div>
 @endsection

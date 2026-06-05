@@ -40,6 +40,13 @@ class NilaiController extends Controller
         $siswas = $pembelajaran->kelas->siswas()->where('status', 'Aktif')->get();
         $tapel  = TahunPelajaran::aktif();
 
+        // ── CEK KUNCI NILAI ──────────────────────────────────────
+        if ($tapel && $tapel->is_locked) {
+            return back()->with('error',
+                '🔒 Nilai untuk tahun pelajaran "' . $tapel->nama . '" sedang dikunci oleh Kepala Sekolah. Anda tidak dapat mengedit nilai saat ini.'
+            );
+        }
+
         $nilais = Nilai::where('mata_pelajaran_id', $pembelajaran->mata_pelajaran_id)
             ->where('tahun_pelajaran_id', $tapel?->id)
             ->whereIn('siswa_id', $siswas->pluck('id'))
@@ -55,8 +62,14 @@ class NilaiController extends Controller
     {
         $tapel = TahunPelajaran::aktif();
 
-        // Ambil mata_pelajaran_id dari pembelajaran_id ← PERBAIKAN
-        $pembelajaran = Pembelajaran::findOrFail($request->pembelajaran_id);
+        // ── CEK KUNCI NILAI ──────────────────────────────────────
+        if ($tapel && $tapel->is_locked) {
+            return back()->with('error',
+                '🔒 Nilai sedang dikunci oleh Kepala Sekolah. Anda tidak dapat menyimpan nilai saat ini.'
+            );
+        }
+
+        $pembelajaran    = Pembelajaran::findOrFail($request->pembelajaran_id);
         $mataPelajaranId = $pembelajaran->mata_pelajaran_id;
 
         foreach ($request->nilai as $siswaId => $data) {
@@ -69,7 +82,7 @@ class NilaiController extends Controller
             Nilai::updateOrCreate(
                 [
                     'siswa_id'           => $siswaId,
-                    'mata_pelajaran_id'  => $mataPelajaranId, // ← PERBAIKAN
+                    'mata_pelajaran_id'  => $mataPelajaranId,
                     'tahun_pelajaran_id' => $tapel->id,
                 ],
                 [
@@ -85,16 +98,17 @@ class NilaiController extends Controller
 
         return back()->with('success', 'Nilai berhasil disimpan!');
     }
+
     public function nilaiAkhirDetail($id)
-{
-    $kelas = Kelas::with(['waliKelas', 'tahunPelajaran', 'siswas'])->findOrFail($id);
-    $pembelajarans = Pembelajaran::with('mataPelajaran')
-        ->where('kelas_id', $id)
-        ->get();
-    $siswas = $kelas->siswas;
-    $nilais = Nilai::whereIn('siswa_id', $siswas->pluck('id'))
-        ->get()
-        ->groupBy('siswa_id');
-    return view('admin.nilai.akhir-detail', compact('kelas', 'pembelajarans', 'siswas', 'nilais'));
-}
+    {
+        $kelas = Kelas::with(['waliKelas', 'tahunPelajaran', 'siswas'])->findOrFail($id);
+        $pembelajarans = Pembelajaran::with('mataPelajaran')
+            ->where('kelas_id', $id)
+            ->get();
+        $siswas = $kelas->siswas;
+        $nilais = Nilai::whereIn('siswa_id', $siswas->pluck('id'))
+            ->get()
+            ->groupBy('siswa_id');
+        return view('admin.nilai.akhir-detail', compact('kelas', 'pembelajarans', 'siswas', 'nilais'));
+    }
 }

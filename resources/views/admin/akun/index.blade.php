@@ -9,7 +9,6 @@
     </div>
     <div class="card-body">
 
-        {{-- Toolbar --}}
         <div class="table-toolbar">
             <div style="display:flex;align-items:center;gap:8px;">
                 <select class="per-page" id="perPageSelect" onchange="changePerPage(this.value)">
@@ -23,14 +22,12 @@
                    value="{{ request('search') }}" onkeyup="liveSearch(this.value)">
         </div>
 
-        {{-- Table --}}
         <div class="table-wrapper">
             <table id="akunTable">
                 <thead>
                     <tr>
                         <th width="40">#</th>
                         <th>Nama</th>
-                        <th>Username</th>
                         <th>Email</th>
                         <th>Role</th>
                         <th width="80">Aksi</th>
@@ -41,10 +38,9 @@
                     <tr>
                         <td>{{ $akuns->firstItem() + $i }}</td>
                         <td>{{ $akun->name }}</td>
-                        <td>{{ $akun->username ?? '-' }}</td>
                         <td>{{ $akun->email }}</td>
                         <td>
-                            <span class="badge {{ $akun->role === 'admin' ? 'badge-danger' : 'badge-success' }}">
+                            <span class="badge {{ $akun->role === 'admin' ? 'badge-danger' : ($akun->role === 'guru' ? 'badge-warning' : 'badge-success') }}">
                                 {{ strtoupper($akun->role) }}
                             </span>
                         </td>
@@ -56,7 +52,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" style="text-align:center;color:#7f8c8d;padding:40px">
+                        <td colspan="5" style="text-align:center;color:#7f8c8d;padding:40px">
                             <i class="fa fa-inbox fa-2x"></i><br><br>Belum ada data akun
                         </td>
                     </tr>
@@ -65,7 +61,6 @@
             </table>
         </div>
 
-        {{-- Info & Pagination --}}
         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;flex-wrap:wrap;gap:8px;">
             <div style="font-size:12px;color:#7f8c8d;">
                 Menampilkan {{ $akuns->firstItem() ?? 0 }}–{{ $akuns->lastItem() ?? 0 }}

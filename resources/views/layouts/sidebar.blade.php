@@ -23,7 +23,7 @@
         <p class="px-4 py-2 text-xs text-white/30 uppercase tracking-widest font-semibold mt-2">Master Data</p>
 
         <!-- Biodata (collapsible) -->
-        <div x-data="{ open: {{ request()->routeIs('siswa.*') || request()->routeIs('guru.*') ? 'true' : 'false' }} }">
+        <div x-data="{ open: {{ request()->routeIs('siswa.*') || request()->routeIs('guru.*') || request()->routeIs('admin.kepsek.*') ? 'true' : 'false' }} }">
             <button @click="open = !open"
                     class="w-full flex items-center justify-between px-4 py-2 text-gray-300 hover:bg-white/10 hover:text-white text-sm transition">
                 <div class="flex items-center gap-2"><i class="fas fa-address-card w-4"></i> BIODATA</div>
@@ -39,6 +39,11 @@
                    class="flex items-center gap-2 py-2 pl-10 pr-4 text-gray-400 hover:text-white hover:bg-white/5 text-sm transition
                           {{ request()->routeIs('guru.*') ? 'text-white' : '' }}">
                     <i class="fas fa-circle text-xs"></i> Data Guru
+                </a>
+                <a href="{{ route('admin.kepsek.index') }}"
+                   class="flex items-center gap-2 py-2 pl-10 pr-4 text-gray-400 hover:text-white hover:bg-white/5 text-sm transition
+                          {{ request()->routeIs('admin.kepsek.*') ? 'text-white' : '' }}">
+                    <i class="fas fa-circle text-xs"></i> Kepala Sekolah
                 </a>
                 <a href="{{ route('kelas.index') }}"
                    class="flex items-center gap-2 py-2 pl-10 pr-4 text-gray-400 hover:text-white hover:bg-white/5 text-sm transition">

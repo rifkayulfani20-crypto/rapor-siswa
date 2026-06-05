@@ -6,7 +6,19 @@ use Illuminate\Support\Facades\Hash;
 class ProfilController extends Controller {
 
     public function index() {
-        return view('admin.profil.index', ['user' => auth()->user()]);
+        $user = auth()->user();
+        $role = $user->role;
+
+        if ($role === 'kepsek') {
+            return view('kepsek.profil', compact('user'));
+        } elseif ($role === 'guru') {
+            return view('guru-panel.profil', compact('user'));
+        } elseif ($role === 'siswa') {
+            return view('siswa-panel.profil', compact('user'));
+        }
+
+        // default admin
+        return view('admin.profil.index', ['user' => $user]);
     }
 
     public function update(Request $request) {

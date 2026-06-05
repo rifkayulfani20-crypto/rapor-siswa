@@ -1,125 +1,264 @@
-@extends('layouts.siswa')
-@section('content')
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Raport - {{ $siswa->nama }}</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: Arial, sans-serif; font-size: 12px; color: #1a1a1a; background: #fff; }
+        .no-print { margin-bottom: 16px; padding: 12px; background: #f8f9fa; border-bottom: 1px solid #ddd; }
+        .no-print button, .no-print a { display:inline-block; padding:8px 18px; border-radius:5px; text-decoration:none; font-size:13px; cursor:pointer; border:none; }
+        .btn-print { background:#c0392b; color:#fff; }
+        .btn-back  { background:#ddd; color:#333; }
+        .wrapper   { max-width: 820px; margin: 0 auto; border: 2px solid #1a1a1a; padding: 20px 24px; }
+        .header { display:flex; align-items:center; justify-content:center; gap:16px; border-bottom: 3px double #1a1a1a; padding-bottom: 12px; margin-bottom: 14px; text-align:center; }
+        .header .logo { font-size: 52px; line-height:1; }
+        .header-text h1 { font-size:20px; font-weight:900; text-transform:uppercase; letter-spacing:2px; color:#1a1a1a; }
+        .info-section { border: 1px solid #1a1a1a; margin-bottom:14px; }
+        .info-section table { width:100%; border-collapse:collapse; font-size:12px; }
+        .info-section table td { padding:6px 12px; border:1px solid #ccc; }
+        .info-section table td:first-child { width:160px; color:#444; background:#f9f9f9; font-weight:500; }
+        .section-title { font-weight:bold; font-size:12px; background:#1a3a5c; color:#fff; padding:6px 10px; margin:12px 0 0; }
+        table.nilai { width:100%; border-collapse:collapse; font-size:12px; margin-bottom:0; }
+        table.nilai th { background:#1a3a5c; color:#fff; padding:7px 8px; border:1px solid #aaa; text-align:center; }
+        table.nilai td { padding:6px 8px; border:1px solid #ccc; vertical-align:middle; }
+        table.nilai tr:nth-child(even) td { background:#f5f7fa; }
+        .badge { display:inline-block; padding:2px 10px; border-radius:10px; font-size:11px; font-weight:bold; }
+        .badge-A { background:#d5f5e3; color:#1e8449; }
+        .badge-B { background:#d6eaf8; color:#1a5276; }
+        .badge-C { background:#fef9e7; color:#9a7d0a; }
+        .badge-D { background:#fdecea; color:#a93226; }
+        .summary-box { display:grid; grid-template-columns:1fr 1fr 1fr; border:1px solid #1a3a5c; margin-bottom:14px; }
+        .summary-box .item { padding:8px; text-align:center; border-right:1px solid #1a3a5c; }
+        .summary-box .item:last-child { border-right:none; }
+        .summary-box .item .label { font-size:11px; color:#555; font-weight:bold; text-transform:uppercase; }
+        .summary-box .item .value { font-size:20px; font-weight:900; color:#1a3a5c; margin-top:2px; }
+        .summary-header { background:#1a3a5c; color:#fff; text-align:center; font-size:11px; font-weight:bold; padding:4px; }
+        .bottom-section { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; border:1px solid #ccc; margin-bottom:14px; }
+        .bottom-col { border-right:1px solid #ccc; }
+        .bottom-col:last-child { border-right:none; }
+        .bottom-col-title { background:#1a3a5c; color:#fff; font-weight:bold; font-size:11px; text-align:center; padding:5px; }
+        table.sikap { width:100%; border-collapse:collapse; font-size:11px; }
+        table.sikap th { background:#2c4f7c; color:#fff; padding:4px 8px; text-align:left; border-bottom:1px solid #ccc; }
+        table.sikap td { padding:5px 8px; border-bottom:1px solid #eee; }
+        .kehadiran-list { padding:8px 12px; font-size:12px; }
+        .kehadiran-list .row { display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #eee; }
+        .kehadiran-list .row:last-child { border-bottom:none; }
+        .kehadiran-list .angka { font-weight:bold; }
+        .ttd-section { margin-top:10px; }
+        .ttd-kota { text-align:right; margin-bottom:16px; font-size:12px; }
+        .ttd-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; text-align:center; font-size:12px; }
+        .ttd-space { height:60px; }
+        .ttd-line { border-top:1px solid #1a1a1a; padding-top:4px; font-weight:bold; }
+        .ttd-nip { font-size:11px; font-weight:normal; margin-top:2px; color:#444; }
+        @media print {
+            .no-print { display:none !important; }
+            body { font-size: 11px; }
+            .wrapper { border:2px solid #000; max-width:100%; }
+        }
+    </style>
+</head>
+<body>
 
-<h1 class="page-title">Cetak Raport</h1>
-
-<div style="margin-bottom:16px">
-    <button onclick="window.print()" class="btn btn-primary" style="background:#3498db;color:white;padding:8px 20px;border:none;border-radius:5px;cursor:pointer;font-size:13px">
-        <i class="fa fa-print"></i> Cetak / Download PDF
-    </button>
+<div class="no-print">
+    <button class="btn-print" onclick="window.print()">🖨 Cetak Raport</button>
+    <a class="btn-back" href="{{ url()->previous() }}">← Kembali</a>
 </div>
 
-<div id="raport" class="card" style="max-width:800px;margin:0 auto;padding:30px">
+<div class="wrapper">
 
-    {{-- Header --}}
-    <div style="text-align:center;border-bottom:3px solid #2c3e50;padding-bottom:16px;margin-bottom:20px">
-        <h2 style="font-size:16px;font-weight:700;color:#2c3e50;text-transform:uppercase">{{ $sekolah?->nama ?? 'MTs Rekayasa' }}</h2>
-        <p style="font-size:12px;color:#7f8c8d">{{ $sekolah?->alamat ?? '' }}</p>
-        <p style="font-size:12px;color:#7f8c8d">Telp: {{ $sekolah?->telepon ?? '-' }} | Email: {{ $sekolah?->email ?? '-' }}</p>
-    </div>
-
-    <h3 style="text-align:center;font-size:15px;margin-bottom:20px;color:#2c3e50">
-        LAPORAN HASIL BELAJAR SISWA<br>
-        <small style="font-size:12px;color:#7f8c8d">{{ $tapel?->nama ?? '-' }}</small>
-    </h3>
-
-    {{-- Info Siswa --}}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;margin-bottom:20px">
-        @php
-        $info = [
-            'Nama Siswa'  => $siswa->nama,
-            'NIS / NISN'  => $siswa->nis . ' / ' . $siswa->nisn,
-            'Kelas'       => $siswa->kelas?->nama ?? '-',
-            'Semester'    => $tapel?->semester ?? '-',
-        ];
-        @endphp
-        @foreach($info as $k => $v)
-        <div style="display:flex;gap:8px">
-            <span style="width:100px;color:#7f8c8d">{{ $k }}</span>
-            <span>: {{ $v }}</span>
+    {{-- HEADER --}}
+    <div class="header">
+        <div class="logo">🏫</div>
+        <div class="header-text">
+            <h1>SISTEM PENGOLAHAN RAPOR SISWA</h1>
+            <h1>PESERTA DIDIK</h1>
         </div>
-        @endforeach
     </div>
 
-    {{-- Tabel Nilai --}}
-    <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:20px">
-        <thead style="background:#2c3e50;color:white">
+    {{-- INFO SISWA --}}
+    <div class="info-section">
+        <table>
             <tr>
-                <th style="padding:8px;border:1px solid #ddd">#</th>
-                <th style="padding:8px;border:1px solid #ddd;text-align:left">Mata Pelajaran</th>
-                <th style="padding:8px;border:1px solid #ddd">KKM</th>
-                <th style="padding:8px;border:1px solid #ddd">Nilai Akhir</th>
-                <th style="padding:8px;border:1px solid #ddd">Predikat</th>
-                <th style="padding:8px;border:1px solid #ddd">Keterangan</th>
+                <td>Nama Peserta Didik</td>
+                <td><strong>{{ $siswa->nama }}</strong></td>
+            </tr>
+            <tr>
+                <td>NIS / NISN</td>
+                <td>{{ $siswa->nis }} / {{ $siswa->nisn ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td>Kelas</td>
+                <td>{{ $siswa->kelas?->nama ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td>Semester</td>
+                <td>{{ $tapel->semester }}</td>
+            </tr>
+            <tr>
+                <td>Wali Kelas</td>
+                <td>{{ $siswa->kelas?->waliKelas?->nama ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td>Tahun Pelajaran</td>
+                <td>{{ $tapel->nama ?? '-' }}</td>
+            </tr>
+        </table>
+    </div>
+
+    {{-- NILAI MATA PELAJARAN --}}
+    <div class="section-title">A. Nilai Mata Pelajaran</div>
+    <table class="nilai">
+        <thead>
+            <tr>
+                <th style="width:40px;">No</th>
+                <th style="width:220px;">Mata Pelajaran</th>
+                <th style="width:60px;">KKM</th>
+                <th style="width:80px;">Nilai Akhir</th>
+                <th style="width:80px;">Predikat</th>
+                <th>Deskripsi</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($nilais as $i => $n)
+            @php $totalNilai = 0; $countNilai = 0; @endphp
+            @forelse($nilais as $i => $nilai)
+            @php
+                $na       = $nilai->nilai_akhir ?? 0;
+                $kkm      = $nilai->mataPelajaran?->kkm ?? 75;
+                $predikat = $na >= 90 ? 'A' : ($na >= 80 ? 'B' : ($na >= 70 ? 'C' : 'D'));
+                $lulus    = $na >= $kkm;
+                $totalNilai += $na;
+                $countNilai++;
+            @endphp
             <tr>
-                <td style="padding:7px 8px;border:1px solid #ddd;text-align:center">{{ $i+1 }}</td>
-                <td style="padding:7px 8px;border:1px solid #ddd">{{ $n->mataPelajaran?->nama }}</td>
-                <td style="padding:7px 8px;border:1px solid #ddd;text-align:center">{{ $n->mataPelajaran?->kkm ?? 75 }}</td>
-                <td style="padding:7px 8px;border:1px solid #ddd;text-align:center;font-weight:700">{{ $n->nilai_akhir ?? '-' }}</td>
-                <td style="padding:7px 8px;border:1px solid #ddd;text-align:center">{{ $n->getPredikat() }}</td>
-                <td style="padding:7px 8px;border:1px solid #ddd;text-align:center">
-                    {{ ($n->nilai_akhir ?? 0) >= ($n->mataPelajaran?->kkm ?? 75) ? 'Tuntas' : 'Belum Tuntas' }}
+                <td style="text-align:center;">{{ $i+1 }}</td>
+                <td>{{ $nilai->mataPelajaran?->nama ?? '-' }}</td>
+                <td style="text-align:center;">{{ $kkm }}</td>
+                <td style="text-align:center;font-weight:bold;color:{{ $lulus ? '#1e8449' : '#c0392b' }};">
+                    {{ number_format($na, 2) }}
                 </td>
+                <td style="text-align:center;">
+                    <span class="badge badge-{{ $predikat }}">{{ $predikat }}</span>
+                </td>
+                <td>{{ $nilai->deskripsi ?? '-' }}</td>
             </tr>
             @empty
-            <tr><td colspan="6" style="text-align:center;padding:20px;color:#999">Belum ada nilai</td></tr>
+            <tr><td colspan="6" style="text-align:center;color:#aaa;padding:14px;">Belum ada nilai</td></tr>
             @endforelse
         </tbody>
-        <tfoot>
-            <tr style="background:#f8f9fa;font-weight:700">
-                <td colspan="3" style="padding:8px;border:1px solid #ddd;text-align:right">Rata-rata:</td>
-                <td style="padding:8px;border:1px solid #ddd;text-align:center">{{ round($nilais->avg('nilai_akhir'),2) }}</td>
-                <td colspan="2" style="border:1px solid #ddd"></td>
-            </tr>
-        </tfoot>
     </table>
 
-    {{-- PERINGKAT --}}
-    <div style="font-size:12px;color:#2c3e50;margin-bottom:12px">
-        <strong>Peringkat:</strong> {{ $peringkat['peringkat'] }} dari {{ $peringkat['total_siswa'] }} siswa &nbsp;|&nbsp;
-        <strong>Rata-rata:</strong> {{ $peringkat['rata_rata'] }}
+    {{-- REKAP NILAI --}}
+    @if($countNilai > 0)
+    <div style="border:1px solid #1a3a5c;margin-bottom:14px;">
+        <div class="summary-header">Rekap Nilai</div>
+        <div class="summary-box" style="border:none;">
+            <div class="item">
+                <div class="label">Rata-rata Nilai Akhir</div>
+                <div class="value">{{ number_format($rataRata, 1) }}</div>
+            </div>
+            <div class="item">
+                <div class="label">Predikat</div>
+                <div class="value">
+                    @php $pred = $rataRata >= 90 ? 'A' : ($rataRata >= 80 ? 'B' : ($rataRata >= 70 ? 'C' : 'D')); @endphp
+                    <span class="badge badge-{{ $pred }}" style="font-size:18px;">{{ $pred }}</span>
+                </div>
+            </div>
+            <div class="item">
+                <div class="label">Peringkat Kelas</div>
+                <div class="value" style="color:#c0392b;">{{ $peringkat }} dari {{ $totalSiswa }}</div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- SIKAP & KEHADIRAN --}}
+    <div class="bottom-section">
+        <div class="bottom-col">
+            <div class="bottom-col-title">B. Sikap Sosial</div>
+            <table class="sikap">
+                <thead><tr><th>Aspek</th><th>Predikat</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td>Sikap Sosial</td>
+                        <td>{{ $sikap?->predikat_sosial ?? '-' }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="font-size:11px;color:#555;font-style:italic;">
+                            {{ $sikap?->deskripsi_sosial ?? '-' }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="bottom-col">
+            <div class="bottom-col-title">C. Sikap Spiritual</div>
+            <table class="sikap">
+                <thead><tr><th>Aspek</th><th>Predikat</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td>Sikap Spiritual</td>
+                        <td>{{ $sikap?->predikat_spiritual ?? '-' }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="font-size:11px;color:#555;font-style:italic;">
+                            {{ $sikap?->deskripsi_spiritual ?? '-' }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="bottom-col">
+            <div class="bottom-col-title">D. Kehadiran</div>
+            <div class="kehadiran-list">
+                <div class="row">
+                    <span>Sakit</span>
+                    <span>: <span class="angka" style="color:#e74c3c;">{{ $kehadiran?->sakit ?? 0 }}</span> hari</span>
+                </div>
+                <div class="row">
+                    <span>Izin</span>
+                    <span>: <span class="angka" style="color:#e67e22;">{{ $kehadiran?->izin ?? 0 }}</span> hari</span>
+                </div>
+                <div class="row">
+                    <span>Tanpa Keterangan</span>
+                    <span>: <span class="angka" style="color:#8e44ad;">{{ $kehadiran?->tanpa_keterangan ?? 0 }}</span> hari</span>
+                </div>
+                <div class="row" style="margin-top:4px;font-weight:bold;">
+                    <span>Total Tidak Hadir</span>
+                    <span>: <span class="angka" style="color:#2c3e50;">
+                        {{ ($kehadiran?->sakit ?? 0) + ($kehadiran?->izin ?? 0) + ($kehadiran?->tanpa_keterangan ?? 0) }}
+                    </span> hari</span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    {{-- Kehadiran --}}
-    <div style="margin-bottom:24px;font-size:13px">
-        <strong>Kehadiran:</strong>
-        <div style="display:flex;gap:24px;margin-top:8px">
-            <span>Sakit: <strong>{{ $kehadiran->sakit ?? 0 }}</strong> hari</span>
-            <span>Izin: <strong>{{ $kehadiran->izin ?? 0 }}</strong> hari</span>
-            <span>Tanpa Keterangan: <strong>{{ $kehadiran->tanpa_keterangan ?? 0 }}</strong> hari</span>
+    {{-- TTD --}}
+    <div class="ttd-section">
+        <div class="ttd-kota">
+            {{ $tapel->tempat_pembagian ?? 'Batam' }}, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}
+        </div>
+        <div class="ttd-grid">
+            <div>
+                <p>Orang Tua / Wali Murid,</p>
+                <div class="ttd-space"></div>
+                <div class="ttd-line">( _________________________ )</div>
+            </div>
+            <div>
+                <p>Wali Kelas,</p>
+                <div class="ttd-space"></div>
+                <div class="ttd-line">{{ $siswa->kelas?->waliKelas?->nama ?? '___________________________' }}</div>
+                <div class="ttd-nip">NIP. {{ $siswa->kelas?->waliKelas?->nip ?? '-' }}</div>
+            </div>
+            <div>
+                <p>Kepala Sekolah,</p>
+                <div class="ttd-space"></div>
+                <div class="ttd-line">{{ \App\Models\Sekolah::first()?->kepala_sekolah ?? '___________________________' }}</div>
+                <div class="ttd-nip">NIP. {{ \App\Models\Sekolah::first()?->nip_kepala_sekolah ?? '-' }}</div>
+            </div>
         </div>
     </div>
 
-    {{-- Tanda Tangan --}}
-    <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:40px">
-        <div style="text-align:center">
-            <p>Orang Tua / Wali</p>
-            <div style="margin-top:60px">(__________________)</div>
-        </div>
-        <div style="text-align:center">
-            <p>{{ $tapel?->tempat_pembagian ?? '' }}, {{ $tapel?->tanggal_pembagian?->format('d F Y') ?? '' }}</p>
-            <p>Wali Kelas</p>
-            <div style="margin-top:60px">(__________________)</div>
-        </div>
-        <div style="text-align:center">
-            <p>Kepala Sekolah</p>
-            <div style="margin-top:60px">{{ $sekolah?->kepala_sekolah ?? '(__________________)'  }}</div>
-        </div>
-    </div>
 </div>
-
-@push('scripts')
-<style>
-@media print {
-    .sidebar, .topbar, footer, button { display: none !important; }
-    .main { margin-left: 0 !important; }
-    .content { padding: 0 !important; }
-    #raport { box-shadow: none !important; border: none !important; }
-}
-</style>
-@endpush
-@endsection
+</body>
+</html>

@@ -9,8 +9,8 @@ class AdminController extends Controller
 {
     public function index()
     {
-        $admins = User::where('role', 'admin')->latest()->paginate(10);
-        return view('admin.data-admin.index', compact('admins'));
+        $users = User::where('role', 'admin')->latest()->paginate(10);
+        return view('admin.data-admin.index', compact('users'));
     }
 
     public function create()
@@ -28,7 +28,6 @@ class AdminController extends Controller
 
         User::create([
             'name'     => $request->name,
-            'username' => $request->username,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
             'role'     => 'admin',
@@ -49,7 +48,7 @@ class AdminController extends Controller
             'email' => 'required|email|unique:users,email,' . $user->id,
         ]);
 
-        $user->update($request->only('name', 'username', 'email'));
+        $user->update($request->only('name', 'email'));
 
         if ($request->filled('password')) {
             $user->update(['password' => Hash::make($request->password)]);

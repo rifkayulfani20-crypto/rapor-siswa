@@ -1,4 +1,4 @@
-@extends('layouts.guru')
+@extends('layouts.app')
 @section('title', 'Profil Saya')
 @section('page-title', 'Profil Saya')
 @section('content')
@@ -8,8 +8,8 @@
 <div style="max-width:600px;">
 
     {{-- Avatar Card --}}
-    <div class="card mb-3" style="border-radius:12px; overflow:hidden; box-shadow:0 4px 20px rgba(44,62,80,0.15); border:none;">
-        <div style="background:linear-gradient(135deg,#2c3e50 0%,#1a252f 100%); padding:24px 28px; display:flex; align-items:center; gap:20px; position:relative; overflow:hidden;">
+    <div class="card mb-3" style="border-radius:12px; overflow:hidden; box-shadow:0 4px 20px rgba(26,58,108,0.15); border:none;">
+        <div style="background:linear-gradient(135deg,#1a3a6c 0%,#122a52 100%); padding:24px 28px; display:flex; align-items:center; gap:20px; position:relative; overflow:hidden;">
             <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,0.06);border-radius:50%;"></div>
             <div style="position:absolute;bottom:-40px;left:80px;width:150px;height:150px;background:rgba(255,255,255,0.04);border-radius:50%;"></div>
 
@@ -32,9 +32,9 @@
     </div>
 
     {{-- Form Card --}}
-    <div class="card" style="border-radius:12px;border:none;box-shadow:0 4px 20px rgba(44,62,80,0.12);overflow:hidden;">
+    <div class="card" style="border-radius:12px;border:none;box-shadow:0 4px 20px rgba(26,58,108,0.12);overflow:hidden;">
 
-        <div class="card-header" style="background:linear-gradient(90deg,#2c3e50,#1a252f);border:none;padding:14px 22px;">
+        <div class="card-header" style="background:linear-gradient(90deg,#1a3a6c,#122a52);border:none;padding:14px 22px;">
             <div style="font-weight:600;color:#fff;font-size:14px;display:flex;align-items:center;gap:8px;">
                 <i class="fa fa-user-edit"></i> Edit Profil
             </div>
@@ -52,12 +52,12 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('guru.profil.update') }}">
+            <form method="POST" action="{{ route('profil.update') }}">
                 @csrf @method('PUT')
 
                 {{-- Nama --}}
                 <div class="form-group">
-                    <label class="form-label" style="font-size:11px;font-weight:700;color:#2c3e50;text-transform:uppercase;letter-spacing:0.6px;">
+                    <label class="form-label" style="font-size:11px;font-weight:700;color:#1a3a6c;text-transform:uppercase;letter-spacing:0.6px;">
                         <i class="fa fa-user" style="margin-right:4px;"></i> Nama Lengkap
                     </label>
                     <div style="position:relative;">
@@ -73,7 +73,7 @@
 
                 {{-- Email --}}
                 <div class="form-group">
-                    <label class="form-label" style="font-size:11px;font-weight:700;color:#2c3e50;text-transform:uppercase;letter-spacing:0.6px;">
+                    <label class="form-label" style="font-size:11px;font-weight:700;color:#1a3a6c;text-transform:uppercase;letter-spacing:0.6px;">
                         <i class="fa fa-envelope" style="margin-right:4px;"></i> Email
                     </label>
                     <div style="position:relative;">
@@ -90,7 +90,7 @@
                 {{-- Divider --}}
                 <div style="display:flex;align-items:center;gap:12px;margin:24px 0 8px;">
                     <div style="flex:1;height:1px;background:#dce3ea;"></div>
-                    <span style="font-size:11px;font-weight:700;color:#2c3e50;text-transform:uppercase;letter-spacing:0.6px;white-space:nowrap;">
+                    <span style="font-size:11px;font-weight:700;color:#1a3a6c;text-transform:uppercase;letter-spacing:0.6px;white-space:nowrap;">
                         <i class="fa fa-lock" style="margin-right:4px;"></i> Ubah Password
                     </span>
                     <div style="flex:1;height:1px;background:#dce3ea;"></div>
@@ -99,7 +99,7 @@
 
                 {{-- Password Baru --}}
                 <div class="form-group">
-                    <label class="form-label" style="font-size:11px;font-weight:700;color:#2c3e50;text-transform:uppercase;letter-spacing:0.6px;">
+                    <label class="form-label" style="font-size:11px;font-weight:700;color:#1a3a6c;text-transform:uppercase;letter-spacing:0.6px;">
                         <i class="fa fa-lock" style="margin-right:4px;"></i> Password Baru
                     </label>
                     <div style="position:relative;">
@@ -118,7 +118,7 @@
 
                 {{-- Konfirmasi Password --}}
                 <div class="form-group">
-                    <label class="form-label" style="font-size:11px;font-weight:700;color:#2c3e50;text-transform:uppercase;letter-spacing:0.6px;">
+                    <label class="form-label" style="font-size:11px;font-weight:700;color:#1a3a6c;text-transform:uppercase;letter-spacing:0.6px;">
                         <i class="fa fa-lock" style="margin-right:4px;"></i> Konfirmasi Password
                     </label>
                     <div style="position:relative;">
@@ -137,7 +137,7 @@
                 {{-- Tombol --}}
                 <div style="margin-top:24px;">
                     <button type="submit" class="btn"
-                            style="background:linear-gradient(135deg,#2c3e50,#1a252f);color:#fff;border:none;padding:10px 28px;border-radius:8px;font-size:14px;font-weight:600;box-shadow:0 4px 12px rgba(44,62,80,0.35);display:inline-flex;align-items:center;gap:8px;">
+                            style="background:linear-gradient(135deg,#1a3a6c,#122a52);color:#fff;border:none;padding:10px 28px;border-radius:8px;font-size:14px;font-weight:600;box-shadow:0 4px 12px rgba(26,58,108,0.35);display:inline-flex;align-items:center;gap:8px;">
                         <i class="fa fa-save"></i> Simpan Perubahan
                     </button>
                 </div>

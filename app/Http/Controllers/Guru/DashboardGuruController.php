@@ -222,7 +222,8 @@ class DashboardGuruController extends Controller
         $kelass = Kelas::with(['waliKelas', 'tahunPelajaran', 'siswas'])
             ->where('wali_kelas_id', $guruId)
             ->get();
-        return view('guru-panel.raport', compact('kelass'));
+        $tapel = \App\Models\TahunPelajaran::aktif();
+        return view('guru-panel.raport', compact('kelass', 'tapel'));
     }
 
     public function raportCetak(\App\Models\Siswa $siswa)
@@ -233,13 +234,13 @@ class DashboardGuruController extends Controller
             ->when($tapel, fn($q) => $q->where('tahun_pelajaran_id', $tapel->id))
             ->get();
         $sikap = SikapSiswa::where('siswa_id', $siswa->id)
+            ->where('kelas_id', $siswa->kelas_id)
             ->when($tapel, fn($q) => $q->where('tahun_pelajaran_id', $tapel->id))
             ->first();
         $kehadiran = Kehadiran::where('siswa_id', $siswa->id)
             ->when($tapel, fn($q) => $q->where('tahun_pelajaran_id', $tapel->id))
             ->first();
 
-        // Hitung peringkat di kelas
         $semuaSiswaKelas = Siswa::where('kelas_id', $siswa->kelas_id)->pluck('id');
         $rataRataSiswa = [];
         foreach ($semuaSiswaKelas as $sid) {

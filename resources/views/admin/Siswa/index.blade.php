@@ -68,9 +68,9 @@
                         <td>
                             <div style="display:flex;gap:4px;">
                                 {{-- Detail --}}
-                                <a href="{{ route('siswa.edit', $siswa) }}" class="btn btn-success btn-sm" title="Detail">
+                                <a href="{{ route('siswa.show', $siswa->id) }}" class="btn btn-success btn-sm" title="Detail">
                                    <i class="fa fa-list"></i>
-                               </a>
+                                </a>
                                 {{-- Edit --}}
                                 <a href="{{ route('siswa.edit', $siswa->id) }}" class="btn btn-primary btn-sm" title="Edit">
                                     <i class="fa fa-edit"></i>

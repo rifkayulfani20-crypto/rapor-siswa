@@ -5,91 +5,44 @@ namespace App\Http\Controllers\Siswa;
 use App\Http\Controllers\Controller;
 use App\Models\Siswa;
 use App\Models\Nilai;
-use App\Models\Kehadiran;
 use App\Models\TahunPelajaran;
-use App\Models\Sekolah;
 
 class DashboardSiswaController extends Controller
 {
     private function getSiswa()
     {
         return Siswa::where('user_id', auth()->id())
-                    ->with('kelas')
-                    ->firstOrFail();
-    }
-
-    private function getPeringkat($siswa, $tapel)
-    {
-        // Ambil rata-rata nilai semua siswa di kelas yang sama
-        $rataKelas = Nilai::where('tahun_pelajaran_id', $tapel?->id)
-            ->whereHas('siswa', fn($q) => $q->where('kelas_id', $siswa->kelas_id))
-            ->selectRaw('siswa_id, AVG(nilai_akhir) as rata')
-            ->groupBy('siswa_id')
-            ->orderByDesc('rata')
-            ->get();
-
-        $peringkat   = 1;
-        $totalSiswa  = $rataKelas->count();
-        $rataSiswaIni = $rataKelas->firstWhere('siswa_id', $siswa->id)?->rata ?? 0;
-
-        foreach ($rataKelas as $i => $item) {
-            if ($item->siswa_id == $siswa->id) {
-                $peringkat = $i + 1;
-                break;
-            }
-        }
-
-        return [
-            'peringkat'   => $peringkat,
-            'total_siswa' => $totalSiswa,
-            'rata_rata'   => round($rataSiswaIni, 2),
-        ];
+            ->with(['kelas.waliKelas'])
+            ->firstOrFail();
     }
 
     public function dashboard()
     {
-        $siswa     = $this->getSiswa();
-        $tapel     = TahunPelajaran::aktif();
-        $nilais    = Nilai::where('siswa_id', $siswa->id)
-                         ->where('tahun_pelajaran_id', $tapel?->id)
-                         ->with('mataPelajaran')
-                         ->get();
-        $kehadiran = Kehadiran::where('siswa_id', $siswa->id)
-                         ->where('tahun_pelajaran_id', $tapel?->id)
-                         ->first();
-        $sekolah   = Sekolah::first();
-        $peringkat = $this->getPeringkat($siswa, $tapel);
+        $siswa = $this->getSiswa();
+        $tapel = TahunPelajaran::aktif();
 
-        return view('siswa-panel.dashboard', compact('siswa','tapel','nilais','kehadiran','sekolah','peringkat'));
+        $jumlahNilai = Nilai::where('siswa_id', $siswa->id)
+            ->when($tapel, fn($q) => $q->where('tahun_pelajaran_id', $tapel->id))
+            ->count();
+
+        $rataRata = round(Nilai::where('siswa_id', $siswa->id)
+            ->when($tapel, fn($q) => $q->where('tahun_pelajaran_id', $tapel->id))
+            ->avg('nilai_akhir') ?? 0, 1);
+
+        return view('siswa-panel.dashboard', compact('siswa', 'tapel', 'jumlahNilai', 'rataRata'));
     }
 
     public function nilai()
     {
-        $siswa  = $this->getSiswa();
-        $tapel  = TahunPelajaran::aktif();
-        $nilais = Nilai::where('siswa_id', $siswa->id)
-                       ->where('tahun_pelajaran_id', $tapel?->id)
-                       ->with('mataPelajaran')
-                       ->get();
+        $siswa = $this->getSiswa();
+        $tapel = TahunPelajaran::aktif();
 
-        return view('siswa-panel.nilai', compact('siswa','tapel','nilais'));
-    }
+        $nilais = Nilai::with('mataPelajaran')
+            ->where('siswa_id', $siswa->id)
+            ->when($tapel, fn($q) => $q->where('tahun_pelajaran_id', $tapel->id))
+            ->get();
 
-    public function raport()
-    {
-        $siswa     = $this->getSiswa();
-        $tapel     = TahunPelajaran::aktif();
-        $nilais    = Nilai::where('siswa_id', $siswa->id)
-                         ->where('tahun_pelajaran_id', $tapel?->id)
-                         ->with('mataPelajaran')
-                         ->get();
-        $kehadiran = Kehadiran::where('siswa_id', $siswa->id)
-                         ->where('tahun_pelajaran_id', $tapel?->id)
-                         ->first();
-        $sekolah   = Sekolah::first();
-        $peringkat = $this->getPeringkat($siswa, $tapel);
-
-        return view('siswa-panel.raport', compact('siswa','tapel','nilais','kehadiran','sekolah','peringkat'));
+        return view('siswa-panel.nilai', compact('siswa', 'tapel', 'nilais'));
     }
 
     public function profil()

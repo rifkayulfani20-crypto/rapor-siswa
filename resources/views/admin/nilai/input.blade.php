@@ -33,6 +33,12 @@
     </div>
     <div class="card-body">
 
+        @if(session('error'))
+            <div style="background:#fdf0f0;border:1px solid #e74c3c;border-left:4px solid #c0392b;color:#721c24;padding:14px 18px;border-radius:8px;margin-bottom:16px;font-size:13px;display:flex;align-items:center;gap:10px;">
+                <i class="fas fa-lock" style="font-size:18px;"></i>
+                <div><strong>Nilai Terkunci</strong><br>{{ session('error') }}</div>
+            </div>
+        @endif
         @if(session('success'))
             <div class="alert alert-success"><i class="fas fa-check-circle"></i> {{ session('success') }}</div>
         @endif

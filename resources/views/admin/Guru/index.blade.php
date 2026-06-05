@@ -18,7 +18,6 @@
     </div>
     <div class="card-body">
 
-        {{-- Toolbar --}}
         <div class="table-toolbar">
             <div style="display:flex;align-items:center;gap:8px;">
                 <select class="per-page" id="perPageSelect" onchange="changePerPage(this.value)">
@@ -32,7 +31,6 @@
                    value="{{ request('search') }}" onkeyup="liveSearch(this.value)">
         </div>
 
-        {{-- Table --}}
         <div class="table-wrapper">
             <table id="guruTable">
                 <thead>
@@ -44,7 +42,7 @@
                         <th>Jenis Kelamin</th>
                         <th>No. HP</th>
                         <th>Email</th>
-                        <th width="120">Aksi</th>
+                        <th width="130">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -59,6 +57,9 @@
                         <td>{{ $guru->user->email ?? '-' }}</td>
                         <td>
                             <div style="display:flex;gap:4px;">
+                                <a href="{{ route('guru.show', $guru->id) }}" class="btn btn-success btn-sm" title="Detail">
+                                    <i class="fa fa-list"></i>
+                                </a>
                                 <a href="{{ route('guru.edit', $guru->id) }}" class="btn btn-primary btn-sm" title="Edit">
                                     <i class="fa fa-edit"></i>
                                 </a>
@@ -85,7 +86,6 @@
             </table>
         </div>
 
-        {{-- Info & Pagination --}}
         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;flex-wrap:wrap;gap:8px;">
             <div style="font-size:12px;color:#7f8c8d;">
                 Menampilkan {{ $gurus->firstItem() ?? 0 }}–{{ $gurus->lastItem() ?? 0 }}

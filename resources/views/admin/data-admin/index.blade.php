@@ -18,7 +18,6 @@
     </div>
     <div class="card-body">
 
-        {{-- Toolbar --}}
         <div class="table-toolbar">
             <div style="display:flex;align-items:center;gap:8px;">
                 <select class="per-page" id="perPageSelect" onchange="changePerPage(this.value)">
@@ -32,7 +31,6 @@
                    value="{{ request('search') }}" onkeyup="liveSearch(this.value)">
         </div>
 
-        {{-- Table --}}
         <div class="table-wrapper">
             <table id="adminTable">
                 <thead>
@@ -40,23 +38,23 @@
                         <th width="40">#</th>
                         <th>Nama</th>
                         <th>Email</th>
-                        <th width="120">Aksi</th>
+                        <th width="100">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($admins as $i => $admin)
+                    @forelse($users as $i => $user)
                     <tr>
-                        <td>{{ $admins->firstItem() + $i }}</td>
-                        <td>{{ $admin->name }}</td>
-                        <td>{{ $admin->email }}</td>
+                        <td>{{ $users->firstItem() + $i }}</td>
+                        <td>{{ $user->name }}</td>
+                        <td>{{ $user->email }}</td>
                         <td>
                             <div style="display:flex;gap:4px;">
-                                <a href="{{ route('admin.edit', $admin->id) }}" class="btn btn-primary btn-sm" title="Edit">
+                                <a href="{{ route('admin.edit', $user->id) }}" class="btn btn-primary btn-sm" title="Edit">
                                     <i class="fa fa-edit"></i>
                                 </a>
-                                <form method="POST" action="{{ route('admin.destroy', $admin->id) }}"
+                                <form method="POST" action="{{ route('admin.destroy', $user->id) }}"
                                       style="display:inline"
-                                      onsubmit="return confirm('Hapus data admin {{ addslashes($admin->name) }}?')">
+                                      onsubmit="return confirm('Hapus data admin {{ addslashes($user->name) }}?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-sm" title="Hapus">
@@ -77,14 +75,13 @@
             </table>
         </div>
 
-        {{-- Info & Pagination --}}
         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;flex-wrap:wrap;gap:8px;">
             <div style="font-size:12px;color:#7f8c8d;">
-                Menampilkan {{ $admins->firstItem() ?? 0 }}–{{ $admins->lastItem() ?? 0 }}
-                dari {{ $admins->total() }} data
+                Menampilkan {{ $users->firstItem() ?? 0 }}–{{ $users->lastItem() ?? 0 }}
+                dari {{ $users->total() }} data
             </div>
             <div class="pagination">
-                {{ $admins->appends(request()->query())->links() }}
+                {{ $users->appends(request()->query())->links() }}
             </div>
         </div>
 
@@ -100,6 +97,7 @@ function liveSearch(keyword) {
         row.style.display = row.textContent.toLowerCase().includes(keyword) ? '' : 'none';
     });
 }
+
 function changePerPage(val) {
     const url = new URL(window.location.href);
     url.searchParams.set('per_page', val);

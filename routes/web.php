@@ -14,8 +14,11 @@ use App\Http\Controllers\RaportController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\AkunController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\KepsekController;
+use App\Http\Controllers\KepsekUserController;
 use App\Http\Controllers\Guru\DashboardGuruController;
 use App\Http\Controllers\Siswa\DashboardSiswaController;
+use App\Http\Controllers\Siswa\SiswaRaportController;
 use Illuminate\Support\Facades\Route;
 
 // Landing Page
@@ -49,6 +52,8 @@ Route::middleware(['auth'])->group(function () {
                 'destroy' => 'siswa.destroy',
             ]);
 
+        Route::get('admin/datasiswa/{siswa}', [SiswaController::class, 'show'])->name('siswa.show');
+
         // Guru
         Route::resource('admin/dataguru', GuruController::class)
             ->except('show')
@@ -61,6 +66,8 @@ Route::middleware(['auth'])->group(function () {
                 'update'  => 'guru.update',
                 'destroy' => 'guru.destroy',
             ]);
+
+        Route::get('admin/dataguru/{guru}', [GuruController::class, 'show'])->name('guru.show');
 
         // Admin
         Route::resource('admin/dataadmin', AdminController::class)
@@ -129,6 +136,19 @@ Route::middleware(['auth'])->group(function () {
                 'destroy' => 'pembelajaran.destroy',
             ]);
 
+        // Kepala Sekolah User
+        Route::resource('admin/data-kepsek', KepsekUserController::class)
+            ->except('show')
+            ->parameters(['data-kepsek' => 'kepsek'])
+            ->names([
+                'index'   => 'kepsek-user.index',
+                'create'  => 'kepsek-user.create',
+                'store'   => 'kepsek-user.store',
+                'edit'    => 'kepsek-user.edit',
+                'update'  => 'kepsek-user.update',
+                'destroy' => 'kepsek-user.destroy',
+            ]);
+
         // Raport Admin
         Route::get('/admin/raport', [RaportController::class, 'index'])->name('raport.index');
         Route::get('/admin/raport/cetak/{siswa}', [RaportController::class, 'cetak'])->name('raport.cetak');
@@ -180,12 +200,22 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/datakelas/{kelas}/siswa', [DashboardGuruController::class, 'kelasSiswa'])->name('walikelas.kelas.siswa');
     });
 
+    // ==================== KEPSEK ONLY ====================
+    Route::middleware(['role:kepsek,admin'])->prefix('kepsek')->name('kepsek.')->group(function () {
+        Route::get('/dashboard', [KepsekController::class, 'dashboard'])->name('dashboard');
+        Route::post('/tapel/{tapel}/lock', [KepsekController::class, 'lock'])->name('tapel.lock');
+        Route::post('/tapel/{tapel}/unlock', [KepsekController::class, 'unlock'])->name('tapel.unlock');
+    });
+
     // ==================== SISWA ONLY ====================
     Route::middleware(['role:siswa'])->prefix('siswa')->name('siswa.')->group(function () {
         Route::get('/dashboard', [DashboardSiswaController::class, 'dashboard'])->name('dashboard');
         Route::get('/nilai',     [DashboardSiswaController::class, 'nilai'])->name('nilai');
-        Route::get('/raport',    [DashboardSiswaController::class, 'raport'])->name('raport');
         Route::get('/profil',    [DashboardSiswaController::class, 'profil'])->name('profil');
+
+        // Raport Siswa
+        Route::get('/raport',       [SiswaRaportController::class, 'index'])->name('raport');
+        Route::get('/raport/cetak', [SiswaRaportController::class, 'cetak'])->name('raport.cetak');
     });
 
 });
