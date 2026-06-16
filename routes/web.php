@@ -14,8 +14,8 @@ use App\Http\Controllers\RaportController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\AkunController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\KepsekAdminController;
 use App\Http\Controllers\KepsekController;
-use App\Http\Controllers\KepsekUserController;
 use App\Http\Controllers\Guru\DashboardGuruController;
 use App\Http\Controllers\Siswa\DashboardSiswaController;
 use App\Http\Controllers\Siswa\SiswaRaportController;
@@ -136,17 +136,17 @@ Route::middleware(['auth'])->group(function () {
                 'destroy' => 'pembelajaran.destroy',
             ]);
 
-        // Kepala Sekolah User
-        Route::resource('admin/data-kepsek', KepsekUserController::class)
+        // Kepala Sekolah - Data dikelola Admin (TERPISAH dari Guru)
+        Route::resource('admin/datakepsek', KepsekAdminController::class)
             ->except('show')
-            ->parameters(['data-kepsek' => 'kepsek'])
+            ->parameters(['datakepsek' => 'kepsek'])
             ->names([
-                'index'   => 'kepsek-user.index',
-                'create'  => 'kepsek-user.create',
-                'store'   => 'kepsek-user.store',
-                'edit'    => 'kepsek-user.edit',
-                'update'  => 'kepsek-user.update',
-                'destroy' => 'kepsek-user.destroy',
+                'index'   => 'admin.kepsek.index',
+                'create'  => 'admin.kepsek.create',
+                'store'   => 'admin.kepsek.store',
+                'edit'    => 'admin.kepsek.edit',
+                'update'  => 'admin.kepsek.update',
+                'destroy' => 'admin.kepsek.destroy',
             ]);
 
         // Raport Admin
@@ -161,6 +161,25 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/admin/nilaiakhir/{kelas}', [NilaiController::class, 'nilaiAkhirDetail'])->name('nilai.akhir.detail');
         Route::get('/admin/nilai/{pembelajaran}/input', [NilaiController::class, 'input'])->name('nilai.input');
         Route::post('/admin/nilai/simpan', [NilaiController::class, 'simpan'])->name('nilai.simpan');
+    });
+
+    // ==================== KEPALA SEKOLAH ONLY ====================
+    Route::middleware(['role:kepsek'])->prefix('kepsek')->name('kepsek.')->group(function () {
+
+        // Dashboard & Kunci Nilai
+        Route::get('/dashboard', [KepsekController::class, 'dashboard'])->name('dashboard');
+
+        // Nilai Akhir (lihat saja, tidak bisa edit)
+        Route::get('/nilaiakhir', [KepsekController::class, 'nilaiAkhir'])->name('nilai.akhir');
+        Route::get('/nilaiakhir/{kelas}', [KepsekController::class, 'nilaiAkhirDetail'])->name('nilai.akhir.detail');
+
+        // Kunci / Buka Kunci Nilai
+        Route::post('/tapel/{tapel}/lock',   [KepsekController::class, 'lockTapel'])->name('tapel.lock');
+        Route::post('/tapel/{tapel}/unlock', [KepsekController::class, 'unlockTapel'])->name('tapel.unlock');
+
+        // Profil Kepala Sekolah
+        Route::get('/profil', [KepsekController::class, 'profil'])->name('profil');
+        Route::put('/profil', [KepsekController::class, 'profilUpdate'])->name('profil.update');
     });
 
     // ==================== GURU ONLY ====================
@@ -200,18 +219,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/datakelas/{kelas}/siswa', [DashboardGuruController::class, 'kelasSiswa'])->name('walikelas.kelas.siswa');
     });
 
-    // ==================== KEPSEK ONLY ====================
-    Route::middleware(['role:kepsek,admin'])->prefix('kepsek')->name('kepsek.')->group(function () {
-        Route::get('/dashboard', [KepsekController::class, 'dashboard'])->name('dashboard');
-        Route::post('/tapel/{tapel}/lock', [KepsekController::class, 'lock'])->name('tapel.lock');
-        Route::post('/tapel/{tapel}/unlock', [KepsekController::class, 'unlock'])->name('tapel.unlock');
-    });
-
     // ==================== SISWA ONLY ====================
     Route::middleware(['role:siswa'])->prefix('siswa')->name('siswa.')->group(function () {
         Route::get('/dashboard', [DashboardSiswaController::class, 'dashboard'])->name('dashboard');
         Route::get('/nilai',     [DashboardSiswaController::class, 'nilai'])->name('nilai');
         Route::get('/profil',    [DashboardSiswaController::class, 'profil'])->name('profil');
+        Route::put('/profil/password', [DashboardSiswaController::class, 'gantiPassword'])->name('profil.password');
 
         // Raport Siswa
         Route::get('/raport',       [SiswaRaportController::class, 'index'])->name('raport');

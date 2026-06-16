@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'e-Raport') – Sistem Pengolahan Rapor Siswa</title>
+    <title>Sistem Pengolahan Rapor Siswa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>tailwind.config = { corePlugins: { preflight: false } }</script>
+    <script>
+        tailwind.config = { corePlugins: { preflight: false } }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -19,14 +21,26 @@
         .sidebar-header .brand { display: flex; flex-direction: column; }
         .sidebar-header .brand-title { font-weight: 700; font-size: 13px; color: #2c3e50; line-height: 1.2; }
         .sidebar-header .brand-sub { font-size: 10px; color: #999; margin-top: 2px; }
+
         .sidebar-menu { flex: 1; padding: 10px 0; overflow-y: auto; }
         .sidebar-menu::-webkit-scrollbar { width: 3px; }
         .sidebar-menu::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+
         .menu-label { font-size: 10px; text-transform: uppercase; color: #aaa; padding: 12px 15px 4px; letter-spacing: 1px; font-weight: 600; }
         .menu-item { display: flex; align-items: center; gap: 10px; padding: 10px 15px; color: #555; text-decoration: none; font-size: 13px; cursor: pointer; transition: all 0.2s ease; border: none; background: none; width: 100%; text-align: left; }
         .menu-item:hover { background: #f0f4fb; color: #1a3a6c; padding-left: 20px; }
         .menu-item.active { background: #1a3a6c; color: #ffffff; }
         .menu-item i.icon { width: 17px; text-align: center; font-size: 13px; }
+        .menu-arrow { margin-left: auto; font-size: 10px; transition: transform 0.25s; color: #aaa; }
+        .menu-toggle.open .menu-arrow { transform: rotate(180deg); }
+
+        .submenu { background: #fafafa; display: none; border-left: 3px solid #1a3a6c; }
+        .submenu.open { display: block; animation: slideDown 0.25s ease; }
+        .submenu .menu-item { padding: 8px 15px 8px 36px; font-size: 12px; color: #666; }
+        .submenu .menu-item:hover { background: #f0f4fb; color: #1a3a6c; padding-left: 40px; }
+        .submenu .menu-item.active { background: #1a3a6c; color: #fff; }
+        .submenu .menu-item i.icon { font-size: 6px; width: 14px; }
+
         .sidebar-footer { padding: 10px 15px; border-top: 1px solid #eee; font-size: 11px; color: #bbb; text-align: center; }
 
         /* ── OVERLAY ── */
@@ -57,7 +71,6 @@
         .alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 13px; display: flex; align-items: center; gap: 8px; animation: fadeInUp 0.3s ease; }
         .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .alert-danger  { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .alert-info    { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
 
         /* ── CARDS ── */
         .card { background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); margin-bottom: 20px; transition: transform 0.3s ease, box-shadow 0.3s ease; animation: fadeInUp 0.4s ease; }
@@ -85,6 +98,7 @@
         tbody tr:last-child { border-bottom: none; }
         tbody tr:hover { background: #f0f4fb; transform: translateX(3px); }
         tbody td { padding: 9px 13px; vertical-align: middle; color: #444; }
+
         .badge { padding: 3px 9px; border-radius: 12px; font-size: 11px; font-weight: 600; }
         .badge-success { background: #eafaf1; color: #1e8449; }
         .badge-danger  { background: #fdf0f0; color: #c0392b; }
@@ -122,6 +136,10 @@
             from { opacity: 0; transform: translateY(20px); }
             to   { opacity: 1; transform: translateY(0); }
         }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
 
         /* ── RESPONSIVE ── */
         @media (max-width: 768px) {
@@ -137,37 +155,42 @@
 
 <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
 
+<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <div class="logo">S</div>
+        <div class="logo">K</div>
         <div class="brand">
             <span class="brand-title">Rapor Siswa</span>
-            <span class="brand-sub">Panel Siswa</span>
+            <span class="brand-sub">Panel Kepsek</span>
         </div>
     </div>
 
     <nav class="sidebar-menu">
-        <a href="{{ route('siswa.dashboard') }}" class="menu-item {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">
+
+        <a href="{{ route('kepsek.dashboard') }}" class="menu-item {{ request()->routeIs('kepsek.dashboard') ? 'active' : '' }}">
             <i class="fa fa-tachometer-alt icon"></i> Dashboard
         </a>
 
-        <div class="menu-label">Raport</div>
-        <a href="{{ route('siswa.nilai') }}" class="menu-item {{ request()->routeIs('siswa.nilai') ? 'active' : '' }}">
-            <i class="fa fa-file-alt icon"></i> Nilai Akhir
-        </a>
-        <a href="{{ route('siswa.raport') }}" class="menu-item {{ request()->routeIs('siswa.raport*') ? 'active' : '' }}">
-            <i class="fa fa-print icon"></i> Cetak Raport
+        <div class="menu-label">Penilaian</div>
+
+        <a href="{{ route('kepsek.nilai.akhir') }}" class="menu-item {{ request()->routeIs('kepsek.nilai.akhir*') ? 'active' : '' }}">
+            <i class="fa fa-star icon"></i> Nilai Akhir
         </a>
 
         <div class="menu-label">Akun</div>
-        <a href="{{ route('siswa.profil') }}" class="menu-item {{ request()->routeIs('siswa.profil') ? 'active' : '' }}">
-            <i class="fa fa-user icon"></i> Profil
+
+        <a href="{{ route('kepsek.profil') }}" class="menu-item {{ request()->routeIs('kepsek.profil') ? 'active' : '' }}">
+            <i class="fa fa-user icon"></i> Profil Saya
         </a>
+
     </nav>
 
-    <div class="sidebar-footer">&copy; {{ date('Y') }} Sistem Pengolahan Rapor Siswa</div>
+    <div class="sidebar-footer">
+        &copy; {{ date('Y') }} Sistem Pengolahan Rapor Siswa
+    </div>
 </aside>
 
+<!-- MAIN -->
 <div class="main" id="main">
     <header class="topbar">
         <div style="display:flex;align-items:center;gap:12px;">
@@ -182,7 +205,7 @@
         <div class="topbar-right">
             <div class="user-info">
                 <span class="user-name">{{ auth()->user()->name }}</span>
-                <span class="user-role">Siswa</span>
+                <span class="user-role">Kepala Sekolah</span>
             </div>
             <div class="avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
             <form method="POST" action="{{ route('logout') }}">
@@ -196,13 +219,14 @@
 
     <div class="content">
         @if(session('success'))
-            <div class="alert alert-success"><i class="fa fa-check-circle"></i> {{ session('success') }}</div>
+            <div class="alert alert-success">
+                <i class="fa fa-check-circle"></i> {{ session('success') }}
+            </div>
         @endif
         @if(session('error'))
-            <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ session('error') }}</div>
-        @endif
-        @if(session('info'))
-            <div class="alert alert-info"><i class="fa fa-info-circle"></i> {{ session('info') }}</div>
+            <div class="alert alert-danger">
+                <i class="fa fa-exclamation-circle"></i> {{ session('error') }}
+            </div>
         @endif
 
         @yield('content')
@@ -230,6 +254,12 @@ function toggleSidebar() {
 function closeSidebar() {
     document.getElementById('sidebar').classList.remove('show');
     document.getElementById('overlay').classList.remove('show');
+}
+function toggleMenu(btn, id) {
+    const submenu = document.getElementById(id);
+    const isOpen  = submenu.classList.contains('open');
+    submenu.classList.toggle('open', !isOpen);
+    btn.classList.toggle('open', !isOpen);
 }
 window.addEventListener('resize', function() {
     if (window.innerWidth > 768) {

@@ -19,12 +19,33 @@ class DashboardController extends Controller
 
         // ── Dashboard ADMIN ──────────────────────────────
         if ($user->isAdmin()) {
+
+            $totalSiswa = Siswa::where('status', 'Aktif')->count();
+            $totalMapel = MataPelajaran::count();
+
+            $nilaiSudahDiinput = Nilai::when($tapel, fn($q) => $q->where('tahun_pelajaran_id', $tapel->id))->count();
+
+            $persen = ($totalSiswa > 0 && $totalMapel > 0)
+                ? round($nilaiSudahDiinput / ($totalSiswa * $totalMapel) * 100)
+                : 0;
+
+            // Data siswa per kelas untuk chart
+            $siswaPerKelas = Kelas::withCount(['siswas' => fn($q) => $q->where('status', 'Aktif')])
+                ->get()
+                ->map(fn($k) => [
+                    'nama'  => $k->nama,
+                    'total' => $k->siswas_count,
+                ]);
+
             return view('dashboard.index', [
-                'tapel'       => $tapel,
-                'total_siswa' => Siswa::where('status', 'Aktif')->count(),
-                'total_guru'  => Guru::count(),
-                'total_kelas' => Kelas::count(),
-                'total_mapel' => MataPelajaran::count(),
+                'tapel'               => $tapel,
+                'total_siswa'         => $totalSiswa,
+                'total_guru'          => Guru::count(),
+                'total_kelas'         => Kelas::count(),
+                'total_mapel'         => $totalMapel,
+                'nilai_sudah_diinput' => $nilaiSudahDiinput,
+                'persen'              => $persen,
+                'siswa_per_kelas'     => $siswaPerKelas,
             ]);
         }
 
@@ -48,7 +69,6 @@ class DashboardController extends Controller
             ->where('tahun_pelajaran_id', $tapel?->id)
             ->count();
 
-        // Redirect ke dashboard guru dengan layout guru
         return redirect()->route('guru.dashboard');
     }
 }

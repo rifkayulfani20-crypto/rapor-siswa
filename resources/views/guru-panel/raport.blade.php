@@ -23,7 +23,7 @@
             <span class="text-blue-200 font-normal text-xs">
                 — {{ $kelas->tahunPelajaran->tahun_pelajaran ?? '-' }}
                 &nbsp;·&nbsp;
-                Sem. {{ ($kelas->tahunPelajaran->semester ?? 1) == 1 ? 'Ganjil' : 'Genap' }}
+               Sem. {{ $kelas->tahunPelajaran->semester ?? '-' }}
             </span>
         </span>
         <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full">

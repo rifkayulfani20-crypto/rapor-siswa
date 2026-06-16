@@ -28,10 +28,10 @@ class AuthController extends Controller
                 return redirect()->route('dashboard');
             } elseif ($role === 'guru') {
                 return redirect()->route('guru.dashboard');
-            } elseif ($role === 'siswa') {
-                return redirect()->route('siswa.dashboard');
             } elseif ($role === 'kepsek') {
                 return redirect()->route('kepsek.dashboard');
+            } elseif ($role === 'siswa') {
+                return redirect()->route('siswa.dashboard');
             }
 
             Auth::logout();
@@ -46,6 +46,6 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect()->route('login');
+        return redirect()->route('home');
     }
 }

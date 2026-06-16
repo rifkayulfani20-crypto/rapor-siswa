@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Hash;
 
 class SiswaController extends Controller {
 
-    // ─── INDEX + SEARCH SERVER-SIDE ────────────────────────────────────────
     public function index(Request $request) {
         $perPage = $request->input('per_page', 15);
         $search  = $request->input('search');
@@ -26,17 +25,14 @@ class SiswaController extends Controller {
             ->withQueryString();
 
         $kelasList = Kelas::orderBy('nama')->get();
-
         return view('admin.Siswa.index', compact('siswas', 'kelasList'));
     }
 
-    // ─── CREATE ─────────────────────────────────────────────────────────────
     public function create() {
         $kelas = Kelas::orderBy('nama')->get();
         return view('admin.Siswa.form', compact('kelas'));
     }
 
-    // ─── STORE ──────────────────────────────────────────────────────────────
     public function store(Request $request) {
         $request->validate([
             'nama'          => 'required|string|max:255',
@@ -83,19 +79,17 @@ class SiswaController extends Controller {
         return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil ditambahkan!');
     }
 
-    // ─── SHOW ────────────────────────────────────────────────────────────────
     public function show(Siswa $siswa) {
         $siswa->load('kelas');
         return view('admin.Siswa.show', compact('siswa'));
     }
 
-    // ─── EDIT ────────────────────────────────────────────────────────────────
     public function edit(Siswa $siswa) {
+        $siswa->load('user');
         $kelas = Kelas::orderBy('nama')->get();
         return view('admin.Siswa.form', compact('siswa', 'kelas'));
     }
 
-    // ─── UPDATE ──────────────────────────────────────────────────────────────
     public function update(Request $request, Siswa $siswa) {
         $request->validate([
             'nama'          => 'required|string|max:255',
@@ -115,12 +109,15 @@ class SiswaController extends Controller {
         ]);
 
         if ($siswa->user_id) {
-            $siswa->user->update(['name' => $request->nama]);
-            if ($request->filled('email')) {
-                $siswa->user->update(['email' => $request->email]);
-            }
-            if ($request->filled('password')) {
-                $siswa->user->update(['password' => Hash::make($request->password)]);
+            $user = User::find($siswa->user_id);
+            if ($user) {
+                $user->update(['name' => $request->nama]);
+                if ($request->filled('email')) {
+                    $user->update(['email' => $request->email]);
+                }
+                if ($request->filled('password')) {
+                    $user->update(['password' => Hash::make($request->password)]);
+                }
             }
         }
 
@@ -143,20 +140,16 @@ class SiswaController extends Controller {
         return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil diperbarui!');
     }
 
-    // ─── DESTROY (hapus nilai, kehadiran, sikap dulu) ────────────────────────
     public function destroy(Siswa $siswa) {
-        // Hapus data relasi dulu agar tidak terjadi foreign key error
         Nilai::where('siswa_id', $siswa->id)->delete();
         Kehadiran::where('siswa_id', $siswa->id)->delete();
         SikapSiswa::where('siswa_id', $siswa->id)->delete();
 
-        // Hapus akun user terkait
         if ($siswa->user_id) {
             User::find($siswa->user_id)?->delete();
         }
 
         $siswa->delete();
-
-        return redirect()->route('siswa.index')->with('success', 'Data siswa beserta nilai dan kehadiran berhasil dihapus!');
+        return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil dihapus!');
     }
 }

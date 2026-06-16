@@ -11,6 +11,7 @@ use App\Models\Pembelajaran;
 use App\Models\Nilai;
 use App\Models\SikapSiswa;
 use App\Models\Kehadiran;
+use App\Models\TahunPelajaran;
 use Illuminate\Http\Request;
 
 class DashboardGuruController extends Controller
@@ -23,13 +24,51 @@ class DashboardGuruController extends Controller
 
     public function index()
     {
+        $guruId = $this->getGuruId();
+        $tapel  = TahunPelajaran::aktif();
+
+        $pembelajarans = Pembelajaran::with(['mataPelajaran', 'kelas'])
+            ->where('guru_id', $guruId)
+            ->where('status', 'Aktif')
+            ->get();
+
+        $kelasIds = $pembelajarans->pluck('kelas_id')->unique();
+        $mapelIds = $pembelajarans->pluck('mata_pelajaran_id')->unique();
+        $siswaIds = Siswa::whereIn('kelas_id', $kelasIds)->where('status', 'Aktif')->pluck('id');
+
+        $nilaiSudahDiinput = Nilai::whereIn('mata_pelajaran_id', $mapelIds)
+            ->whereIn('siswa_id', $siswaIds)
+            ->when($tapel, fn($q) => $q->where('tahun_pelajaran_id', $tapel->id))
+            ->count();
+
+        $totalTarget = $mapelIds->count() * $siswaIds->count();
+        $persen = $totalTarget > 0 ? round($nilaiSudahDiinput / $totalTarget * 100) : 0;
+
+        $siswaPerKelas = Kelas::whereIn('id', $kelasIds)
+            ->withCount(['siswas' => fn($q) => $q->where('status', 'Aktif')])
+            ->get()
+            ->map(fn($k) => [
+                'nama'  => $k->nama,
+                'total' => $k->siswas_count,
+            ]);
+
+        $nilaiPerMapel = $pembelajarans->map(function($p) use ($siswaIds, $tapel) {
+            $avg = Nilai::where('mata_pelajaran_id', $p->mata_pelajaran_id)
+                ->whereIn('siswa_id', $siswaIds)
+                ->when($tapel, fn($q) => $q->where('tahun_pelajaran_id', $tapel->id))
+                ->avg('nilai_akhir');
+            return [
+                'nama' => $p->mataPelajaran->nama ?? '-',
+                'rata' => round($avg ?? 0, 1),
+            ];
+        })->unique('nama')->values();
+
         return view('guru-panel.dashboard', [
-            'total_siswa'  => Siswa::count(),
-            'total_guru'   => \App\Models\User::where('role', 'guru')->count(),
-            'total_mapel'  => MataPelajaran::count(),
-            'total_kelas'  => Kelas::count(),
-            'total_ekskul' => 5,
-            'persen'       => 53,
+            'total_mapel'     => $mapelIds->count(),
+            'total_kelas'     => $kelasIds->count(),
+            'persen'          => $persen,
+            'siswa_per_kelas' => $siswaPerKelas,
+            'nilai_per_mapel' => $nilaiPerMapel,
         ]);
     }
 
@@ -78,13 +117,13 @@ class DashboardGuruController extends Controller
         foreach ($request->siswa_id as $i => $siswaId) {
             SikapSiswa::updateOrCreate(
                 [
-                    'siswa_id'          => $siswaId,
-                    'kelas_id'          => $kelas,
-                    'tahun_pelajaran_id'=> $kelasModel->tahun_pelajaran_id,
+                    'siswa_id'           => $siswaId,
+                    'kelas_id'           => $kelas,
+                    'tahun_pelajaran_id' => $kelasModel->tahun_pelajaran_id,
                 ],
                 [
-                    'predikat_sosial'   => $request->predikat[$i] ?? null,
-                    'deskripsi_sosial'  => $request->deskripsi[$i] ?? null,
+                    'predikat_sosial'  => $request->predikat[$i] ?? null,
+                    'deskripsi_sosial' => $request->deskripsi[$i] ?? null,
                 ]
             );
         }
@@ -147,7 +186,6 @@ class DashboardGuruController extends Controller
     public function ketidakhadiranUpdate(Request $request, $kelas)
     {
         $kelasModel = Kelas::with(['tahunPelajaran', 'siswas'])->findOrFail($kelas);
-
         foreach ($request->siswa_id as $i => $siswaId) {
             Kehadiran::updateOrCreate(
                 [
@@ -161,7 +199,6 @@ class DashboardGuruController extends Controller
                 ]
             );
         }
-
         return redirect()->route('guru.walikelas.ketidakhadiran.edit', $kelas)
             ->with('success', 'Data ketidakhadiran berhasil disimpan!');
     }
@@ -222,13 +259,13 @@ class DashboardGuruController extends Controller
         $kelass = Kelas::with(['waliKelas', 'tahunPelajaran', 'siswas'])
             ->where('wali_kelas_id', $guruId)
             ->get();
-        $tapel = \App\Models\TahunPelajaran::aktif();
+        $tapel = TahunPelajaran::aktif();
         return view('guru-panel.raport', compact('kelass', 'tapel'));
     }
 
     public function raportCetak(\App\Models\Siswa $siswa)
     {
-        $tapel = \App\Models\TahunPelajaran::aktif();
+        $tapel = TahunPelajaran::aktif();
         $nilais = Nilai::with('mataPelajaran')
             ->where('siswa_id', $siswa->id)
             ->when($tapel, fn($q) => $q->where('tahun_pelajaran_id', $tapel->id))
@@ -259,4 +296,4 @@ class DashboardGuruController extends Controller
             'peringkat', 'totalSiswa', 'rataRata'
         ));
     }
-}
+}   

@@ -177,7 +177,7 @@
                 </div>
             </div>
             <div class="border-t border-white/10 py-4 text-center text-xs text-white/40">
-                &copy; {{ date('Y') }} SISTEM PENGOLAHAN RAPOR SISWA. 
+               Copyright &copy; {{ date('Y') }} <a href="#">Sistem Pengolahan Rapor Siswa</a>
             </div>
         </footer>
     </main>

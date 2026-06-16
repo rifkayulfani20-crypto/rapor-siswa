@@ -1,283 +1,335 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Kepala Sekolah</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = { corePlugins: { preflight: false } }
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; display: flex; min-height: 100vh; }
+@extends('layouts.kepsek_app')
 
-        /* SIDEBAR */
-        .sidebar { width: 230px; background: #ffffff; display: flex; flex-direction: column; min-height: 100vh; position: fixed; top: 0; left: 0; z-index: 100; border-right: 1px solid #e0e0e0; }
-        .sidebar-header { padding: 16px 15px; background: #f5f5f5; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #e0e0e0; }
-        .sidebar-header .logo { width: 36px; height: 36px; background: #1a3a6c; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; color: white; flex-shrink: 0; }
-        .sidebar-header .brand { display: flex; flex-direction: column; }
-        .sidebar-header .brand-title { font-weight: 700; font-size: 13px; color: #2c3e50; line-height: 1.2; }
-        .sidebar-header .brand-sub { font-size: 10px; color: #999; margin-top: 2px; }
-        .sidebar-menu { flex: 1; padding: 10px 0; overflow-y: auto; }
-        .sidebar-menu::-webkit-scrollbar { width: 3px; }
-        .sidebar-menu::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
-        .menu-label { font-size: 10px; text-transform: uppercase; color: #aaa; padding: 12px 15px 4px; letter-spacing: 1px; font-weight: 600; }
-        .menu-item { display: flex; align-items: center; gap: 10px; padding: 10px 15px; color: #555; text-decoration: none; font-size: 13px; cursor: pointer; transition: background 0.2s; border: none; background: none; width: 100%; text-align: left; }
-        .menu-item:hover { background: #f0f4fb; color: #1a3a6c; }
-        .menu-item.active { background: #1a3a6c; color: #ffffff; }
-        .menu-item i.icon { width: 17px; text-align: center; font-size: 13px; }
-        .sidebar-footer { padding: 10px 15px; border-top: 1px solid #eee; font-size: 11px; color: #bbb; text-align: center; }
+@section('content')
+<div class="page-title">Dashboard Kepala Sekolah</div>
 
-        /* TOPBAR */
-        .main { margin-left: 230px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
-        .topbar { background: #fff; padding: 0 22px; height: 56px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 4px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 50; }
-        .topbar-title { font-size: 14px; font-weight: 600; color: #2c3e50; display: flex; align-items: center; gap: 8px; }
-        .topbar-title i { color: #1a3a6c; }
-        .topbar-right { display: flex; align-items: center; gap: 12px; }
-        .user-info { display: flex; flex-direction: column; align-items: flex-end; }
-        .user-name { font-size: 13px; font-weight: 600; color: #2c3e50; line-height: 1.2; }
-        .user-role { font-size: 10px; color: #999; }
-        .avatar { width: 32px; height: 32px; background: #1a3a6c; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: bold; flex-shrink: 0; }
-        .btn-logout { background: #e74c3c; color: white; border: none; padding: 6px 13px; border-radius: 5px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: background 0.2s; }
-        .btn-logout:hover { background: #c0392b; }
+@if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+@endif
+@if(session('error'))
+    <div class="alert alert-danger">{{ session('error') }}</div>
+@endif
 
-        /* CONTENT */
-        .content { padding: 24px; flex: 1; }
-        .page-title { font-size: 20px; font-weight: 700; color: #2c3e50; margin-bottom: 20px; }
-
-        /* ALERT */
-        .alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
-        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .alert-danger  { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-
-        /* CARD */
-        .card { background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); margin-bottom: 20px; }
-        .card-header { padding: 14px 20px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; }
-        .card-body { padding: 20px; }
-
-        /* TABLE */
-        .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        thead { background: #1a3a6c; color: white; }
-        thead th { padding: 10px 13px; text-align: left; font-weight: 600; font-size: 12px; }
-        tbody tr { border-bottom: 1px solid #f0f0f0; transition: background 0.15s; }
-        tbody tr:last-child { border-bottom: none; }
-        tbody tr:hover { background: #f8f9fb; }
-        tbody td { padding: 9px 13px; vertical-align: middle; color: #444; }
-
-        /* BADGE */
-        .badge { padding: 3px 9px; border-radius: 12px; font-size: 11px; font-weight: 600; }
-        .badge-success { background: #eafaf1; color: #1e8449; }
-        .badge-danger  { background: #fdf0f0; color: #c0392b; }
-        .badge-info    { background: #eaf4fb; color: #1a7db8; }
-
-        /* BTN */
-        .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 5px; font-size: 13px; cursor: pointer; border: none; text-decoration: none; font-weight: 500; transition: opacity 0.2s; }
-        .btn:hover { opacity: 0.88; }
-        .btn-danger  { background: #e74c3c; color: white; }
-        .btn-warning { background: #e67e22; color: white; }
-        .btn-sm { padding: 4px 10px; font-size: 11px; }
-
-        /* STATS */
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
-        .stat-card { background: #fff; border-radius: 8px; padding: 18px 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); display: flex; align-items: center; gap: 16px; }
-        .stat-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; flex-shrink: 0; }
-        .stat-info .label { font-size: 12px; color: #999; font-weight: 500; }
-        .stat-info .value { font-size: 24px; font-weight: 800; color: #2c3e50; line-height: 1.2; }
-
-        footer { background: #fff; padding: 12px 24px; text-align: center; font-size: 12px; color: #aaa; border-top: 1px solid #eee; }
-        footer a { color: #1a3a6c; text-decoration: none; }
-    </style>
-</head>
-<body>
-
-{{-- SIDEBAR --}}
-<aside class="sidebar">
-    <div class="sidebar-header">
-        <div class="logo">K</div>
-        <div class="brand">
-            <span class="brand-title">Rapor Siswa</span>
-            <span class="brand-sub">Kepala Sekolah</span>
+{{-- MODAL KUNCI NILAI --}}
+<div id="modalKunci" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 p-6">
+        <div class="text-center mb-4">
+            <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fa fa-lock text-red-500 text-2xl"></i>
+            </div>
+            <h3 class="font-bold text-gray-800 text-base">Kunci Nilai?</h3>
+            <p class="text-gray-500 text-sm mt-1">Guru tidak dapat mengedit nilai setelah dikunci.</p>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="tutupModalKunci()"
+                class="flex-1 py-2 rounded-lg border border-gray-300 text-gray-600 text-sm hover:bg-gray-50 transition">
+                Batal
+            </button>
+            <button onclick="submitKunci()"
+                class="flex-1 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition">
+                <i class="fa fa-lock mr-1"></i> Kunci
+            </button>
         </div>
     </div>
-
-    <nav class="sidebar-menu">
-        <a href="{{ route('kepsek.dashboard') }}" class="menu-item {{ request()->routeIs('kepsek.dashboard') ? 'active' : '' }}">
-            <i class="fa fa-tachometer-alt icon"></i> Dashboard
-        </a>
-
-        <div class="menu-label">Kelola Nilai</div>
-        <a href="{{ route('kepsek.dashboard') }}" class="menu-item {{ request()->routeIs('kepsek.*') ? 'active' : '' }}">
-            <i class="fa fa-lock icon"></i> Kunci Nilai
-        </a>
-
-        <div class="menu-label">Akun</div>
-        <a href="{{ route('profil.index') }}" class="menu-item {{ request()->routeIs('profil.*') ? 'active' : '' }}">
-            <i class="fa fa-user icon"></i> Profil Saya
-        </a>
-    </nav>
-
-    <div class="sidebar-footer">
-        &copy; {{ date('Y') }} Rapor Siswa
-    </div>
-</aside>
-
-{{-- MAIN --}}
-<div class="main">
-    <header class="topbar">
-        <div class="topbar-title">
-            <i class="fa fa-th-large"></i>
-            Sistem Pengolahan Rapor Siswa
-        </div>
-        <div class="topbar-right">
-            <div class="user-info">
-                <span class="user-name">{{ auth()->user()->name }}</span>
-                <span class="user-role">Kepala Sekolah</span>
-            </div>
-            <div class="avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="btn-logout">
-                    <i class="fa fa-sign-out-alt"></i> Keluar
-                </button>
-            </form>
-        </div>
-    </header>
-
-    <div class="content">
-
-        @if(session('success'))
-            <div class="alert alert-success">
-                <i class="fa fa-check-circle"></i> {{ session('success') }}
-            </div>
-        @endif
-        @if(session('error'))
-            <div class="alert alert-danger">
-                <i class="fa fa-exclamation-circle"></i> {{ session('error') }}
-            </div>
-        @endif
-
-        <div class="page-title">Dashboard Kepala Sekolah</div>
-
-        {{-- STATS --}}
-        @php
-            $totalTapel   = $tapels->count();
-            $terkunci     = $tapels->where('is_locked', true)->count();
-            $terbuka      = $tapels->where('is_locked', false)->count();
-        @endphp
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon" style="background:#1a3a6c;">
-                    <i class="fa fa-calendar"></i>
-                </div>
-                <div class="stat-info">
-                    <div class="label">Total Tahun Pelajaran</div>
-                    <div class="value">{{ $totalTapel }}</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background:#e74c3c;">
-                    <i class="fa fa-lock"></i>
-                </div>
-                <div class="stat-info">
-                    <div class="label">Nilai Terkunci</div>
-                    <div class="value">{{ $terkunci }}</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background:#27ae60;">
-                    <i class="fa fa-lock-open"></i>
-                </div>
-                <div class="stat-info">
-                    <div class="label">Nilai Terbuka</div>
-                    <div class="value">{{ $terbuka }}</div>
-                </div>
-            </div>
-        </div>
-
-        {{-- TABEL --}}
-        <div class="card">
-            <div class="card-header">
-                <span style="font-weight:600;font-size:14px;color:#2c3e50;">
-                    <i class="fa fa-lock" style="color:#1a3a6c;margin-right:6px;"></i>
-                    Kelola Kunci Nilai Per Tahun Pelajaran
-                </span>
-            </div>
-            <div class="card-body">
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="text-align:center;width:50px;">No</th>
-                                <th>Tahun Pelajaran</th>
-                                <th style="text-align:center;">Semester</th>
-                                <th style="text-align:center;">Status Aktif</th>
-                                <th style="text-align:center;">Status Nilai</th>
-                                <th style="text-align:center;">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($tapels as $i => $tapel)
-                            <tr>
-                                <td style="text-align:center;">{{ $i + 1 }}</td>
-                                <td><strong>{{ $tapel->nama }}</strong></td>
-                                <td style="text-align:center;">{{ $tapel->semester }}</td>
-                                <td style="text-align:center;">
-                                    @if($tapel->aktif)
-                                        <span class="badge badge-success">✅ Aktif</span>
-                                    @else
-                                        <span class="badge badge-danger">❌ Tidak Aktif</span>
-                                    @endif
-                                </td>
-                                <td style="text-align:center;">
-                                    @if($tapel->is_locked)
-                                        <span class="badge badge-danger">🔒 Terkunci</span>
-                                    @else
-                                        <span class="badge badge-info">🔓 Terbuka</span>
-                                    @endif
-                                </td>
-                                <td style="text-align:center;">
-                                    @if($tapel->is_locked)
-                                        <form action="{{ route('kepsek.tapel.unlock', $tapel) }}" method="POST" style="display:inline;"
-                                            onsubmit="return confirm('Buka kunci nilai {{ $tapel->nama }}?')">
-                                            @csrf
-                                            <button type="submit" class="btn btn-warning btn-sm">
-                                                <i class="fa fa-lock-open"></i> Buka Kunci
-                                            </button>
-                                        </form>
-                                    @else
-                                        <form action="{{ route('kepsek.tapel.lock', $tapel) }}" method="POST" style="display:inline;"
-                                            onsubmit="return confirm('Kunci nilai {{ $tapel->nama }}? Guru tidak bisa mengedit nilai setelah dikunci.')">
-                                            @csrf
-                                            <button type="submit" class="btn btn-danger btn-sm">
-                                                <i class="fa fa-lock"></i> Kunci Nilai
-                                            </button>
-                                        </form>
-                                    @endif
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="6" style="text-align:center;padding:24px;color:#aaa;">
-                                    <i class="fa fa-inbox" style="font-size:24px;display:block;margin-bottom:8px;"></i>
-                                    Belum ada data tahun pelajaran
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <footer>
-        Copyright &copy; {{ date('Y') }} <a href="#">Sistem Pengolahan Rapor Siswa</a>
-    </footer>
 </div>
 
-</body>
-</html>
+{{-- MODAL BUKA KUNCI --}}
+<div id="modalBukaKunci" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 p-6">
+        <div class="text-center mb-4">
+            <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fa fa-lock-open text-green-500 text-2xl"></i>
+            </div>
+            <h3 class="font-bold text-gray-800 text-base">Buka Kunci Nilai?</h3>
+            <p class="text-gray-500 text-sm mt-1">Guru dapat mengedit nilai kembali.</p>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="tutupModalBukaKunci()"
+                class="flex-1 py-2 rounded-lg border border-gray-300 text-gray-600 text-sm hover:bg-gray-50 transition">
+                Batal
+            </button>
+            <button onclick="submitBukaKunci()"
+                class="flex-1 py-2 rounded-lg bg-green-500 hover:bg-green-600 text-white text-sm font-semibold transition">
+                <i class="fa fa-lock-open mr-1"></i> Buka Kunci
+            </button>
+        </div>
+    </div>
+</div>
+
+{{-- Form tersembunyi --}}
+<form id="formKunci" method="POST" style="display:none"></form>
+<form id="formBukaKunci" method="POST" style="display:none"></form>
+
+{{-- STAT CARDS --}}
+<div class="grid grid-cols-2 gap-4 mb-6">
+
+    <div class="bg-[#1a3a6c] text-white rounded-xl p-5 flex items-center justify-between">
+        <div>
+            <div class="text-xl font-bold leading-snug">{{ auth()->user()->name }}</div>
+            <div class="text-sm opacity-85 mt-1">Kepala Sekolah</div>
+            <a href="{{ route('kepsek.profil') }}" class="text-white/70 text-xs no-underline mt-4 block">Lihat profil ›</a>
+        </div>
+        <i class="fas fa-user-tie text-5xl opacity-25"></i>
+    </div>
+
+    <div class="bg-[#1e4d8c] text-white rounded-xl p-5 flex items-center justify-between">
+        <div>
+            <div class="text-4xl font-bold">{{ $totalKelas ?? 0 }}</div>
+            <div class="text-sm opacity-85 mt-1">Total Kelas</div>
+            <a href="{{ route('kepsek.nilai.akhir') }}" class="text-white/70 text-xs no-underline mt-4 block">Lihat detail ›</a>
+        </div>
+        <i class="fas fa-door-open text-5xl opacity-25"></i>
+    </div>
+
+    <div class="bg-[#1a3a6c] text-white rounded-xl p-5 flex items-center justify-between">
+        <div>
+            <div class="text-4xl font-bold">{{ $totalSiswa ?? 0 }}</div>
+            <div class="text-sm opacity-85 mt-1">Total Siswa</div>
+            <a href="{{ route('kepsek.nilai.akhir') }}" class="text-white/70 text-xs no-underline mt-4 block">Lihat nilai ›</a>
+        </div>
+        <i class="fas fa-users text-5xl opacity-25"></i>
+    </div>
+
+    <div class="bg-[#1e4d8c] text-white rounded-xl p-5 flex items-center justify-between">
+        <div>
+            <div class="text-xl font-bold leading-snug">{{ $tapelAktif->nama ?? '-' }}</div>
+            <div class="text-sm opacity-85 mt-1">{{ $tapelAktif->semester ?? 'Tahun Pelajaran Aktif' }}</div>
+            <span class="text-white/70 text-xs mt-4 block">
+                @if($tapelAktif?->is_locked)
+                    <i class="fa fa-lock mr-1"></i> Nilai Terkunci
+                @else
+                    <i class="fa fa-lock-open mr-1"></i> Nilai Terbuka
+                @endif
+            </span>
+        </div>
+        <i class="fas fa-calendar-alt text-5xl opacity-25"></i>
+    </div>
+
+</div>
+
+{{-- CHART SECTION --}}
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+
+    <div class="card">
+        <div class="card-header">
+            <span style="font-weight:600;font-size:13px;color:#1a3a6c;">
+                <i class="fa fa-chart-bar"></i> Rata-rata Nilai per Kelas
+            </span>
+        </div>
+        <div class="card-body">
+            <canvas id="grafikRataRata" height="200"></canvas>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <span style="font-weight:600;font-size:13px;color:#1a3a6c;">
+                <i class="fa fa-chart-pie"></i> Siswa Lulus / Tidak Lulus
+            </span>
+        </div>
+        <div class="card-body" style="display:flex;align-items:center;justify-content:center;">
+            <canvas id="grafikLulus" height="200"></canvas>
+        </div>
+    </div>
+
+</div>
+
+{{-- TABEL TAPEL --}}
+<div class="card">
+    <div class="card-header">
+        <span style="font-weight:600;font-size:14px;"><i class="fa fa-calendar-alt"></i> Daftar Tahun Pelajaran</span>
+        <a href="{{ route('kepsek.nilai.akhir') }}" class="btn btn-primary btn-sm">
+            <i class="fa fa-list"></i> Lihat Nilai Akhir
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Tahun Pelajaran</th>
+                        <th>Semester</th>
+                        <th>Status Aktif</th>
+                        <th>Status Nilai</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($tapels as $i => $tapel)
+                    <tr>
+                        <td>{{ $i + 1 }}</td>
+                        <td>{{ $tapel->nama }}</td>
+                        <td>{{ $tapel->semester }}</td>
+                        <td>
+                            @if($tapel->aktif)
+                                <span class="badge badge-success">Aktif</span>
+                            @else
+                                <span class="badge badge-danger">Tidak Aktif</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if($tapel->is_locked)
+                                <span class="badge badge-danger"><i class="fa fa-lock"></i> Terkunci</span>
+                            @else
+                                <span class="badge badge-success"><i class="fa fa-lock-open"></i> Terbuka</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if($tapel->is_locked)
+                                <button type="button"
+                                    onclick="bukaKunci('{{ route('kepsek.tapel.unlock', $tapel->id) }}')"
+                                    class="btn btn-warning btn-sm">
+                                    <i class="fa fa-lock-open"></i> Buka Kunci
+                                </button>
+                            @else
+                                <button type="button"
+                                    onclick="kunciNilai('{{ route('kepsek.tapel.lock', $tapel->id) }}')"
+                                    class="btn btn-danger btn-sm">
+                                    <i class="fa fa-lock"></i> Kunci Nilai
+                                </button>
+                            @endif
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" style="text-align:center;color:#7f8c8d;padding:40px">
+                            <i class="fa fa-inbox fa-2x"></i><br><br>Belum ada tahun pelajaran
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// ── MODAL KUNCI ──
+function kunciNilai(url) {
+    document.getElementById('formKunci').action = url;
+    document.getElementById('formKunci').innerHTML = '@csrf';
+    const modal = document.getElementById('modalKunci');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+function tutupModalKunci() {
+    const modal = document.getElementById('modalKunci');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+function submitKunci() {
+    document.getElementById('formKunci').submit();
+}
+
+// ── MODAL BUKA KUNCI ──
+function bukaKunci(url) {
+    document.getElementById('formBukaKunci').action = url;
+    document.getElementById('formBukaKunci').innerHTML = '@csrf';
+    const modal = document.getElementById('modalBukaKunci');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+function tutupModalBukaKunci() {
+    const modal = document.getElementById('modalBukaKunci');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+function submitBukaKunci() {
+    document.getElementById('formBukaKunci').submit();
+}
+
+// ── TUTUP MODAL KLIK DI LUAR ──
+document.getElementById('modalKunci').addEventListener('click', function(e) {
+    if (e.target === this) tutupModalKunci();
+});
+document.getElementById('modalBukaKunci').addEventListener('click', function(e) {
+    if (e.target === this) tutupModalBukaKunci();
+});
+
+// ── DATA GRAFIK ──
+const grafikData = @json($grafikKelas);
+const labels     = grafikData.map(d => d.nama);
+const rataRata   = grafikData.map(d => d.rata_rata);
+const lulus      = grafikData.map(d => d.lulus);
+const tidakLulus = grafikData.map(d => d.tidak_lulus);
+const colors     = ['#1a3a6c','#1e4d8c','#2563a8','#3b82c4','#60a5e0','#93c5f8'];
+
+// ── Chart 1: Bar - Rata-rata Nilai per Kelas ──
+new Chart(document.getElementById('grafikRataRata'), {
+    type: 'bar',
+    data: {
+        labels: labels.length ? labels : ['Belum ada data'],
+        datasets: [{
+            label: 'Rata-rata Nilai',
+            data: rataRata.length ? rataRata : [0],
+            backgroundColor: colors,
+            borderRadius: 6,
+            borderSkipped: false,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: ctx => ` Rata-rata: ${ctx.raw}`
+                }
+            }
+        },
+        scales: {
+            y: { beginAtZero: true, max: 100, grid: { color: '#f0f0f0' }, ticks: { font: { size: 11 } } },
+            x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+        }
+    }
+});
+
+// ── Chart 2: Doughnut - Total Lulus vs Tidak Lulus ──
+const totalLulus      = lulus.reduce((a, b) => a + b, 0);
+const totalTidakLulus = tidakLulus.reduce((a, b) => a + b, 0);
+const totalSiswa      = totalLulus + totalTidakLulus;
+const persenLulus     = totalSiswa > 0 ? Math.round((totalLulus / totalSiswa) * 100) : 0;
+
+new Chart(document.getElementById('grafikLulus'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Lulus (≥75)', 'Tidak Lulus (<75)'],
+        datasets: [{
+            data: [totalLulus, totalTidakLulus],
+            backgroundColor: ['#1a3a6c', '#e8edf5'],
+            borderWidth: 0,
+            hoverOffset: 6,
+        }]
+    },
+    options: {
+        responsive: true,
+        cutout: '70%',
+        plugins: {
+            legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 16 } },
+            tooltip: { callbacks: { label: ctx => ` ${ctx.raw} siswa` } }
+        }
+    },
+    plugins: [{
+        id: 'centerText',
+        afterDraw(chart) {
+            const { ctx, chartArea: { width, height, left, top } } = chart;
+            ctx.save();
+            ctx.font = 'bold 28px Segoe UI';
+            ctx.fillStyle = '#1a3a6c';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(persenLulus + '%', left + width / 2, top + height / 2 - 10);
+            ctx.font = '12px Segoe UI';
+            ctx.fillStyle = '#7f8c8d';
+            ctx.fillText('Lulus', left + width / 2, top + height / 2 + 16);
+            ctx.restore();
+        }
+    }]
+});
+</script>
+@endpush
