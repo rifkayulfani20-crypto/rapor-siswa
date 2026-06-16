@@ -22,7 +22,7 @@
                     {{ auth()->user()->name }}
                 </div>
                 <span style="display:inline-block;padding:3px 12px;border-radius:20px;font-size:12px;font-weight:600;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.25);margin-bottom:6px;">
-                    <i class="fa fa-shield-alt" style="margin-right:4px;"></i>{{ ucfirst(auth()->user()->role) }}
+                    <i class="fa fa-chalkboard-teacher" style="margin-right:4px;"></i> Guru
                 </span>
                 <div style="font-size:12px;color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:6px;">
                     <i class="fa fa-envelope"></i> {{ auth()->user()->email }}
@@ -41,6 +41,12 @@
         </div>
 
         <div class="card-body" style="padding:28px 24px;">
+
+            @if(session('success'))
+                <div class="alert alert-success" style="border-radius:8px;border-left:4px solid #27ae60;">
+                    <i class="fa fa-check-circle"></i> {{ session('success') }}
+                </div>
+            @endif
 
             @if($errors->any())
                 <div class="alert alert-danger" style="border-radius:8px;border-left:4px solid #e74c3c;">
@@ -96,6 +102,25 @@
                     <div style="flex:1;height:1px;background:#dce3ea;"></div>
                 </div>
                 <p style="font-size:12px;color:#90a4ae;margin-bottom:16px;">Kosongkan jika tidak ingin mengubah password.</p>
+
+                {{-- Password Lama --}}
+                <div class="form-group">
+                    <label class="form-label" style="font-size:11px;font-weight:700;color:#1a3a6c;text-transform:uppercase;letter-spacing:0.6px;">
+                        <i class="fa fa-lock" style="margin-right:4px;"></i> Password Lama
+                    </label>
+                    <div style="position:relative;">
+                        <i class="fa fa-lock" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#90a4ae;font-size:13px;"></i>
+                        <input type="password" name="password_lama" id="pass0"
+                               class="form-control @error('password_lama') is-invalid @enderror"
+                               style="padding-left:36px;padding-right:40px;border:1.5px solid #dce3ea;border-radius:8px;background:#f5f7f9;font-size:13px;"
+                               placeholder="Masukkan password lama">
+                        <span onclick="toggle('pass0','eye0')"
+                              style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:#90a4ae;font-size:14px;">
+                            <i class="fa fa-eye" id="eye0"></i>
+                        </span>
+                    </div>
+                    @error('password_lama')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                </div>
 
                 {{-- Password Baru --}}
                 <div class="form-group">

@@ -16,10 +16,10 @@ class GuruController extends Controller {
         $request->validate([
             'nama'          => 'required|string|max:255',
             'jenis_kelamin' => 'required|in:L,P',
-            'nip'           => 'nullable|string|unique:gurus',
-            'nuptk'         => 'nullable|string|unique:gurus',
+            'nip'           => 'nullable|numeric|digits_between:1,20|unique:gurus',
+            'nuptk'         => 'nullable|numeric|digits_between:1,20|unique:gurus',
             'email'         => 'required|email|unique:users',
-            'no_hp'         => 'nullable|string',
+            'no_hp'         => 'nullable|numeric|digits_between:8,15',
             'tempat_lahir'  => 'nullable|string',
             'tanggal_lahir' => 'nullable|date',
             'alamat'        => 'nullable|string',
@@ -56,9 +56,9 @@ class GuruController extends Controller {
         $request->validate([
             'nama'          => 'required|string|max:255',
             'jenis_kelamin' => 'required|in:L,P',
-            'nip'           => 'nullable|string|unique:gurus,nip,'.$guru->id,
+            'nip'           => 'nullable|numeric|digits_between:1,20|unique:gurus,nip,'.$guru->id,
             'email'         => 'required|email|unique:users,email,'.($guru->user_id ?? 0),
-            'no_hp'         => 'nullable|string',
+            'no_hp'         => 'nullable|numeric|digits_between:8,15',
         ]);
         $guru->update($request->only('nama','jenis_kelamin','nip','nuptk','no_hp','tempat_lahir','tanggal_lahir','alamat'));
         if ($guru->user) {

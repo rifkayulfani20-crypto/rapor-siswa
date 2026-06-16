@@ -13,6 +13,7 @@ use App\Models\SikapSiswa;
 use App\Models\Kehadiran;
 use App\Models\TahunPelajaran;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class DashboardGuruController extends Controller
 {
@@ -72,15 +73,52 @@ class DashboardGuruController extends Controller
         ]);
     }
 
-    public function profil()       { return view('guru-panel.profil'); }
-    public function profilUpdate() { return back(); }
+    // ── Profil ───────────────────────────────────────────────────
+    public function profil()
+    {
+        return view('guru-panel.profil');
+    }
 
+    public function profilUpdate(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'name'  => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+        ]);
+
+        $user->update([
+            'name'  => $request->name,
+            'email' => $request->email,
+        ]);
+
+        if ($request->filled('password')) {
+            // Cek password lama
+            if (!$request->filled('password_lama') || !Hash::check($request->password_lama, $user->password)) {
+                return back()
+                    ->withErrors(['password_lama' => 'Password lama tidak sesuai.'])
+                    ->withInput();
+            }
+
+            $request->validate([
+                'password' => 'min:6|confirmed',
+            ]);
+
+            $user->update(['password' => Hash::make($request->password)]);
+        }
+
+        return back()->with('success', 'Profil berhasil diperbarui!');
+    }
+
+    // ── Siswa ────────────────────────────────────────────────────
     public function siswaIndex()
     {
         $siswas = Siswa::with('kelas')->get();
         return view('guru-panel.siswa.index', compact('siswas'));
     }
 
+    // ── Wali Kelas ───────────────────────────────────────────────
     public function kelasIndex()
     {
         $guruId = $this->getGuruId();
@@ -96,6 +134,7 @@ class DashboardGuruController extends Controller
         return view('guru-panel.walikelas.kelas-siswa', compact('kelas'));
     }
 
+    // ── Nilai Sosial ─────────────────────────────────────────────
     public function nilaiSosialIndex()
     {
         $guruId = $this->getGuruId();
@@ -130,6 +169,7 @@ class DashboardGuruController extends Controller
         return back()->with('success', 'Nilai sosial berhasil disimpan!');
     }
 
+    // ── Nilai Spiritual ──────────────────────────────────────────
     public function nilaiSpiritualIndex()
     {
         $guruId = $this->getGuruId();
@@ -164,6 +204,7 @@ class DashboardGuruController extends Controller
         return back()->with('success', 'Nilai spiritual berhasil disimpan!');
     }
 
+    // ── Ketidakhadiran ───────────────────────────────────────────
     public function ketidakhadiranIndex()
     {
         $guruId = $this->getGuruId();
@@ -203,6 +244,7 @@ class DashboardGuruController extends Controller
             ->with('success', 'Data ketidakhadiran berhasil disimpan!');
     }
 
+    // ── Catatan ──────────────────────────────────────────────────
     public function catatanIndex()
     {
         $guruId = $this->getGuruId();
@@ -218,8 +260,12 @@ class DashboardGuruController extends Controller
         return view('guru-panel.walikelas.catatan-edit', compact('kelas'));
     }
 
-    public function catatanUpdate($kelas) { return back(); }
+    public function catatanUpdate($kelas)
+    {
+        return back();
+    }
 
+    // ── Nilai Mapel ──────────────────────────────────────────────
     public function nilaiMapelIndex()
     {
         $guruId = $this->getGuruId();
@@ -229,8 +275,12 @@ class DashboardGuruController extends Controller
         return view('guru-panel.mapel.nilai', compact('pembelajarans'));
     }
 
-    public function nilaiEkskulIndex() { return view('guru-panel.ekskul.nilai'); }
+    public function nilaiEkskulIndex()
+    {
+        return view('guru-panel.ekskul.nilai');
+    }
 
+    // ── Nilai Akhir ──────────────────────────────────────────────
     public function nilaiAkhir()
     {
         $guruId = $this->getGuruId();
@@ -253,6 +303,7 @@ class DashboardGuruController extends Controller
         return view('guru-panel.nilaiakhir-detail', compact('kelas', 'pembelajarans', 'siswas', 'nilais'));
     }
 
+    // ── Raport ───────────────────────────────────────────────────
     public function raport()
     {
         $guruId = $this->getGuruId();

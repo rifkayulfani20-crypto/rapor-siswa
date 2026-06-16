@@ -105,7 +105,7 @@
                 {{-- NIS --}}
                 <div>
                     <label style="font-size:12px;font-weight:600;color:#2c3e50;display:block;margin-bottom:5px;">NIS <span style="color:red;">*</span></label>
-                    <input type="text" name="nis" required
+                    <input type="tel" name="nis" pattern="[0-9]*" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')" required
                         value="{{ old('nis', $siswa->nis ?? '') }}"
                         placeholder="Nomor Induk Siswa"
                         style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px;outline:none;box-sizing:border-box;">
@@ -115,7 +115,7 @@
                 {{-- NISN --}}
                 <div>
                     <label style="font-size:12px;font-weight:600;color:#2c3e50;display:block;margin-bottom:5px;">NISN</label>
-                    <input type="text" name="nisn"
+                    <input type="tel" name="nisn" pattern="[0-9]*" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
                         value="{{ old('nisn', $siswa->nisn ?? '') }}"
                         placeholder="Nomor Induk Siswa Nasional"
                         style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px;outline:none;box-sizing:border-box;">
@@ -216,7 +216,7 @@
 
                 <div>
                     <label style="font-size:12px;font-weight:600;color:#2c3e50;display:block;margin-bottom:5px;">No. HP Orang Tua</label>
-                    <input type="text" name="no_hp_ortu" value="{{ old('no_hp_ortu', $siswa->no_hp_ortu ?? '') }}"
+                    <input type="tel" name="no_hp_ortu" pattern="[0-9]*" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')" value="{{ old('no_hp_ortu', $siswa->no_hp_ortu ?? '') }}"
                         placeholder="08xxxxxxxxxx"
                         style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px;outline:none;box-sizing:border-box;">
                 </div>

@@ -1,6 +1,6 @@
 <?php
 namespace App\Http\Controllers;
-use App\Models\{Siswa, Kelas, User, Nilai, Kehadiran, SikapSiswa};
+use App\Models\{Siswa, Kelas, User, Nilai, Kehadiran, SikapSiswa, RiwayatKelas, TahunPelajaran};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -47,7 +47,7 @@ class SiswaController extends Controller {
             'nama_ayah'     => 'nullable|string',
             'nama_ibu'      => 'nullable|string',
             'nama_wali'     => 'nullable|string',
-            'no_hp_ortu'    => 'nullable|string',
+            'no_hp_ortu'    => 'nullable|numeric|digits_between:8,15',
             'kelas_id'      => 'nullable|exists:kelas,id',
             'status'        => 'required|in:Aktif,Nonaktif',
         ]);
@@ -59,7 +59,7 @@ class SiswaController extends Controller {
             'role'     => 'siswa',
         ]);
 
-        Siswa::create([
+        $siswa = Siswa::create([
             'user_id'       => $user->id,
             'nama'          => $request->nama,
             'nis'           => $request->nis,
@@ -75,6 +75,8 @@ class SiswaController extends Controller {
             'kelas_id'      => $request->kelas_id,
             'status'        => $request->status,
         ]);
+
+        $this->catatRiwayatKelas($siswa, $request->kelas_id);
 
         return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil ditambahkan!');
     }
@@ -103,7 +105,7 @@ class SiswaController extends Controller {
             'nama_ayah'     => 'nullable|string',
             'nama_ibu'      => 'nullable|string',
             'nama_wali'     => 'nullable|string',
-            'no_hp_ortu'    => 'nullable|string',
+            'no_hp_ortu'    => 'nullable|numeric|digits_between:8,15',
             'kelas_id'      => 'nullable|exists:kelas,id',
             'status'        => 'required|in:Aktif,Nonaktif',
         ]);
@@ -137,6 +139,8 @@ class SiswaController extends Controller {
             'status'        => $request->status,
         ]);
 
+        $this->catatRiwayatKelas($siswa, $request->kelas_id);
+
         return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil diperbarui!');
     }
 
@@ -144,6 +148,7 @@ class SiswaController extends Controller {
         Nilai::where('siswa_id', $siswa->id)->delete();
         Kehadiran::where('siswa_id', $siswa->id)->delete();
         SikapSiswa::where('siswa_id', $siswa->id)->delete();
+        RiwayatKelas::where('siswa_id', $siswa->id)->delete();
 
         if ($siswa->user_id) {
             User::find($siswa->user_id)?->delete();
@@ -151,5 +156,26 @@ class SiswaController extends Controller {
 
         $siswa->delete();
         return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil dihapus!');
+    }
+
+    /**
+     * Catat/perbarui riwayat kelas siswa untuk tahun pelajaran yang sedang aktif.
+     * Ini memastikan histori kelas di tahun ajaran sebelumnya tidak ikut tertimpa
+     * saat siswa dipindah/naik kelas di tahun ajaran berjalan.
+     */
+    private function catatRiwayatKelas(Siswa $siswa, $kelasId): void {
+        if (!$kelasId) {
+            return;
+        }
+
+        $tapel = TahunPelajaran::aktif();
+        if (!$tapel) {
+            return;
+        }
+
+        RiwayatKelas::updateOrCreate(
+            ['siswa_id' => $siswa->id, 'tahun_pelajaran_id' => $tapel->id],
+            ['kelas_id' => $kelasId]
+        );
     }
 }

@@ -14,4 +14,14 @@ class Siswa extends Model {
     public function kelas()     { return $this->belongsTo(Kelas::class); }
     public function nilais()    { return $this->hasMany(Nilai::class); }
     public function kehadiran() { return $this->hasOne(Kehadiran::class); }
+
+    // Riwayat kelas siswa di setiap tahun pelajaran (tidak ketimpa saat naik kelas)
+    public function riwayatKelas() { return $this->hasMany(RiwayatKelas::class); }
+
+    // Ambil kelas siswa pada tahun pelajaran tertentu (bukan kelas saat ini)
+    public function kelasPada($tahunPelajaranId) {
+        return $this->riwayatKelas()
+            ->where('tahun_pelajaran_id', $tahunPelajaranId)
+            ->first()?->kelas;
+    }
 }

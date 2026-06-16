@@ -10,5 +10,7 @@ class Kelas extends Model {
     public function tahunPelajaran() { return $this->belongsTo(TahunPelajaran::class); }
     public function siswas()         { return $this->hasMany(Siswa::class); }
     public function pembelajaran()   { return $this->hasMany(Pembelajaran::class); }
+
+    // Daftar siswa yang tercatat di kelas ini untuk tahun pelajaran tertentu
+    public function riwayatKelas() { return $this->hasMany(RiwayatKelas::class); }
 }
-    

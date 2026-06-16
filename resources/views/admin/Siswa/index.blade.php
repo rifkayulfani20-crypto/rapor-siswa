@@ -129,5 +129,5 @@ function changePerPage(val) {
     url.searchParams.set('page', 1);
     window.location.href = url.toString();
 }
-</script>
+</script>   
 @endpush

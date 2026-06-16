@@ -38,7 +38,7 @@
                 {{-- NIP --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-600 mb-1">NIP</label>
-                    <input type="text" name="nip"
+                    <input type="tel" name="nip" pattern="[0-9]*" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                         value="{{ old('nip', $kepsek->nip ?? '') }}">
                 </div>
@@ -46,7 +46,7 @@
                 {{-- No HP --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-600 mb-1">No. HP</label>
-                    <input type="text" name="no_hp"
+                    <input type="tel" name="no_hp" pattern="[0-9]*" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                         value="{{ old('no_hp', $kepsek->no_hp ?? '') }}">
                 </div>

@@ -87,6 +87,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/admin/dataakun/{akun}/edit', [AkunController::class, 'edit'])->name('admin.akun.edit');
         Route::put('/admin/dataakun/{akun}', [AkunController::class, 'update'])->name('admin.akun.update');
 
+        // Kepsek (admin kelola data kepsek)
+        Route::get('/admin/kepsek', [KepsekAdminController::class, 'index'])->name('admin.kepsek.index');
+        Route::get('/admin/kepsek/create', [KepsekAdminController::class, 'create'])->name('admin.kepsek.create');
+        Route::post('/admin/kepsek', [KepsekAdminController::class, 'store'])->name('admin.kepsek.store');
+        Route::get('/admin/kepsek/{kepsek}/edit', [KepsekAdminController::class, 'edit'])->name('admin.kepsek.edit');
+        Route::put('/admin/kepsek/{kepsek}', [KepsekAdminController::class, 'update'])->name('admin.kepsek.update');
+        Route::delete('/admin/kepsek/{kepsek}', [KepsekAdminController::class, 'destroy'])->name('admin.kepsek.destroy');
+
         // Tapel
         Route::resource('admin/tapel', TahunPelajaranController::class)
             ->except('show')
@@ -136,19 +144,6 @@ Route::middleware(['auth'])->group(function () {
                 'destroy' => 'pembelajaran.destroy',
             ]);
 
-        // Kepala Sekolah - Data dikelola Admin (TERPISAH dari Guru)
-        Route::resource('admin/datakepsek', KepsekAdminController::class)
-            ->except('show')
-            ->parameters(['datakepsek' => 'kepsek'])
-            ->names([
-                'index'   => 'admin.kepsek.index',
-                'create'  => 'admin.kepsek.create',
-                'store'   => 'admin.kepsek.store',
-                'edit'    => 'admin.kepsek.edit',
-                'update'  => 'admin.kepsek.update',
-                'destroy' => 'admin.kepsek.destroy',
-            ]);
-
         // Raport Admin
         Route::get('/admin/raport', [RaportController::class, 'index'])->name('raport.index');
         Route::get('/admin/raport/cetak/{siswa}', [RaportController::class, 'cetak'])->name('raport.cetak');
@@ -161,25 +156,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/admin/nilaiakhir/{kelas}', [NilaiController::class, 'nilaiAkhirDetail'])->name('nilai.akhir.detail');
         Route::get('/admin/nilai/{pembelajaran}/input', [NilaiController::class, 'input'])->name('nilai.input');
         Route::post('/admin/nilai/simpan', [NilaiController::class, 'simpan'])->name('nilai.simpan');
-    });
-
-    // ==================== KEPALA SEKOLAH ONLY ====================
-    Route::middleware(['role:kepsek'])->prefix('kepsek')->name('kepsek.')->group(function () {
-
-        // Dashboard & Kunci Nilai
-        Route::get('/dashboard', [KepsekController::class, 'dashboard'])->name('dashboard');
-
-        // Nilai Akhir (lihat saja, tidak bisa edit)
-        Route::get('/nilaiakhir', [KepsekController::class, 'nilaiAkhir'])->name('nilai.akhir');
-        Route::get('/nilaiakhir/{kelas}', [KepsekController::class, 'nilaiAkhirDetail'])->name('nilai.akhir.detail');
-
-        // Kunci / Buka Kunci Nilai
-        Route::post('/tapel/{tapel}/lock',   [KepsekController::class, 'lockTapel'])->name('tapel.lock');
-        Route::post('/tapel/{tapel}/unlock', [KepsekController::class, 'unlockTapel'])->name('tapel.unlock');
-
-        // Profil Kepala Sekolah
-        Route::get('/profil', [KepsekController::class, 'profil'])->name('profil');
-        Route::put('/profil', [KepsekController::class, 'profilUpdate'])->name('profil.update');
     });
 
     // ==================== GURU ONLY ====================
@@ -229,6 +205,17 @@ Route::middleware(['auth'])->group(function () {
         // Raport Siswa
         Route::get('/raport',       [SiswaRaportController::class, 'index'])->name('raport');
         Route::get('/raport/cetak', [SiswaRaportController::class, 'cetak'])->name('raport.cetak');
+    });
+
+    // ==================== KEPSEK ONLY ====================
+    Route::middleware(['role:kepsek'])->prefix('kepsek')->name('kepsek.')->group(function () {
+        Route::get('/dashboard', [KepsekController::class, 'dashboard'])->name('dashboard');
+        Route::get('/nilaiakhir', [KepsekController::class, 'nilaiAkhir'])->name('nilai.akhir');
+        Route::get('/nilaiakhir/{id}', [KepsekController::class, 'nilaiAkhirDetail'])->name('nilai.akhir.detail');
+        Route::post('/tapel/{tapel}/lock', [KepsekController::class, 'lockTapel'])->name('tapel.lock');
+        Route::post('/tapel/{tapel}/unlock', [KepsekController::class, 'unlockTapel'])->name('tapel.unlock');
+        Route::get('/profil', [KepsekController::class, 'profil'])->name('profil');
+        Route::put('/profil', [KepsekController::class, 'profilUpdate'])->name('profil.update');
     });
 
 });

@@ -171,7 +171,8 @@
         </a>
 
         <div class="menu-label">Master Data</div>
-@php $biodataOpen = request()->routeIs('siswa.*','guru.*','admin.index','admin.create','admin.edit','admin.update','admin.akun.*','admin.kepsek.*'); @endphp
+
+        @php $biodataOpen = request()->routeIs('siswa.*','guru.*','admin.index','admin.create','admin.edit','admin.update','admin.akun.*'); @endphp
         <button class="menu-item menu-toggle {{ $biodataOpen ? 'open' : '' }}" onclick="toggleMenu(this, 'biodata')">
             <i class="fa fa-id-card icon"></i> Biodata
             <i class="fa fa-chevron-down menu-arrow"></i>
@@ -190,8 +191,8 @@
                 <i class="fa fa-circle icon"></i> Data Akun
             </a>
             <a href="{{ route('admin.kepsek.index') }}" class="menu-item {{ request()->routeIs('admin.kepsek.*') ? 'active' : '' }}">
-                <i class="fa fa-user-tie icon"></i> Data Kepsek
-            </a>
+    <i class="fa fa-user-tie icon"></i> Data Kepsek
+</a>    
         </div>
 
         @php $adminOpen = request()->routeIs('tapel.*','kelas.*','mapel.*'); @endphp
