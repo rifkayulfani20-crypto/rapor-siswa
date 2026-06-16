@@ -8,9 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen flex items-center justify-content-center bg-gradient-to-br from-slate-900 via-slate-700 to-blue-500 flex justify-center">
-
 <div class="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-md mx-4">
-
     {{-- Header --}}
     <div class="text-center mb-7">
         <div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -19,7 +17,6 @@
         <h1 class="text-lg font-bold text-slate-800">sistem pengolahan rapor siswa</h1>
         <p class="text-sm text-slate-400 mt-1">Silakan masuk untuk melanjutkan</p>
     </div>
-
     {{-- Error --}}
     @if($errors->any())
         <div class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-lg mb-4">
@@ -31,11 +28,9 @@
             <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
         </div>
     @endif
-
     <form method="POST" action="{{ route('login') }}">
         @csrf
         <input type="hidden" name="role" id="input-role" value="">
-
         {{-- Login Sebagai --}}
         <div class="mb-4">
             <label class="block text-sm font-semibold text-slate-700 mb-1.5">Login Sebagai</label>
@@ -44,15 +39,13 @@
                 <select onchange="updateRole(this)"
                     class="w-full pl-9 pr-9 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 appearance-none cursor-pointer">
                     <option value="">-- Pilih Role --</option>
-                    <option value="admin"   {{ old('role') == 'admin'   ? 'selected' : '' }}>Admin</option>
-                    <option value="guru"    {{ old('role') == 'guru'    ? 'selected' : '' }}>Guru</option>
-                    <option value="siswa"   {{ old('role') == 'siswa'   ? 'selected' : '' }}>Siswa</option>
-                    <option value="kepsek"  {{ old('role') == 'kepsek'  ? 'selected' : '' }}>Kepala Sekolah</option>
+                    <option value="admin"  {{ old('role') == 'admin'  ? 'selected' : '' }}>Admin</option>
+                    <option value="guru"   {{ old('role') == 'guru'   ? 'selected' : '' }}>Guru</option>
+                    <option value="siswa"  {{ old('role') == 'siswa'  ? 'selected' : '' }}>Siswa</option>
                 </select>
                 <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
             </div>
         </div>
-
         {{-- Badge Role --}}
         <div id="role-badge" class="hidden mb-4">
             <span id="role-badge-inner" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold">
@@ -60,7 +53,6 @@
                 <span id="badge-text">Admin</span>
             </span>
         </div>
-
         {{-- Email --}}
         <div class="mb-4">
             <label class="block text-sm font-semibold text-slate-700 mb-1.5">Email</label>
@@ -76,7 +68,6 @@
                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
             @enderror
         </div>
-
         {{-- Password --}}
         <div class="mb-6">
             <label class="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
@@ -92,45 +83,33 @@
                 </button>
             </div>
         </div>
-
         {{-- Submit --}}
         <button type="submit"
             class="w-full py-3 bg-blue-500 hover:bg-blue-600 active:scale-95 text-white font-semibold rounded-lg text-sm transition-all flex items-center justify-center gap-2">
             <i class="fas fa-sign-in-alt"></i> Masuk
         </button>
-
     </form>
-
 </div>
-
 <script>
     const roleConfig = {
-        admin:  { icon: 'fas fa-shield-alt',         label: 'Admin',          color: 'text-blue-600',   bg: 'bg-blue-50'   },
-        guru:   { icon: 'fas fa-chalkboard-teacher', label: 'Guru',           color: 'text-green-600',  bg: 'bg-green-50'  },
-        siswa:  { icon: 'fas fa-user-graduate',      label: 'Siswa',          color: 'text-orange-500', bg: 'bg-orange-50' },
-        kepsek: { icon: 'fas fa-user-tie',           label: 'Kepala Sekolah', color: 'text-purple-600', bg: 'bg-purple-50' },
+        admin: { icon: 'fas fa-shield-alt',         label: 'Admin', color: 'text-blue-600',   bg: 'bg-blue-50'   },
+        guru:  { icon: 'fas fa-chalkboard-teacher', label: 'Guru',  color: 'text-green-600',  bg: 'bg-green-50'  },
+        siswa: { icon: 'fas fa-user-graduate',      label: 'Siswa', color: 'text-orange-500', bg: 'bg-orange-50' },
     };
-
     function updateRole(select) {
-        const val   = select.value;
-        const badge = document.getElementById('role-badge');
-        const inner = document.getElementById('role-badge-inner');
+        const val    = select.value;
+        const badge  = document.getElementById('role-badge');
+        const inner  = document.getElementById('role-badge-inner');
         const iconEl = document.getElementById('badge-icon');
         const textEl = document.getElementById('badge-text');
-
         document.getElementById('input-role').value = val;
-
         if (!val) { badge.classList.add('hidden'); return; }
-
         const cfg = roleConfig[val];
-
         inner.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ' + cfg.bg + ' ' + cfg.color;
         iconEl.className = cfg.icon + ' ' + cfg.color;
         textEl.textContent = cfg.label;
-
         badge.classList.remove('hidden');
     }
-
     function togglePw() {
         const pw   = document.getElementById('password');
         const icon = document.getElementById('pw-icon');
@@ -142,11 +121,8 @@
             icon.className = 'fas fa-eye text-sm';
         }
     }
-
-    // Restore badge jika ada old('role')
     const sel = document.querySelector('select');
     if (sel && sel.value) updateRole(sel);
 </script>
-
 </body>
 </html>

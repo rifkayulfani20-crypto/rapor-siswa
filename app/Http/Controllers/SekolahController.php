@@ -11,11 +11,8 @@ class SekolahController extends Controller {
     }
     public function update(Request $request, Sekolah $sekolah) {
         $request->validate(['nama' => 'required|string|max:255']);
-        $data = $request->only('nama','npsn','nss','kode_pos','telepon','alamat','email','website','kepala_sekolah','nip_kepala_sekolah');
-        if ($request->hasFile('logo')) {
-            $logo = $request->file('logo')->store('logo','public');
-            $data['logo'] = $logo;
-        }
+        $data = $request->only('nama','npsn','nss','kode_pos','telepon','email','website','kepala_sekolah','nip_kepala_sekolah');
+
         $sekolah->update($data);
         return back()->with('success','Data sekolah berhasil diperbarui!');
     }

@@ -40,11 +40,6 @@
                           {{ request()->routeIs('guru.*') ? 'text-white' : '' }}">
                     <i class="fas fa-circle text-xs"></i> Data Guru
                 </a>
-                <a href="{{ route('admin.kepsek.index') }}"
-                   class="flex items-center gap-2 py-2 pl-10 pr-4 text-gray-400 hover:text-white hover:bg-white/5 text-sm transition
-                          {{ request()->routeIs('admin.kepsek.*') ? 'text-white' : '' }}">
-                    <i class="fas fa-circle text-xs"></i> Kepala Sekolah
-                </a>
                 <a href="{{ route('kelas.index') }}"
                    class="flex items-center gap-2 py-2 pl-10 pr-4 text-gray-400 hover:text-white hover:bg-white/5 text-sm transition">
                     <i class="fas fa-circle text-xs"></i> Data Kelas
@@ -85,7 +80,7 @@
         @endif
 
         <p class="px-4 py-2 text-xs text-white/30 uppercase tracking-widest font-semibold mt-2">Akun</p>
-        <a href="{{ route('profil') }}"
+        <a href="{{ auth()->user()->isAdmin() ? route('profil.index') : route('guru.profil') }}"
            class="flex items-center gap-2 px-4 py-2 text-gray-300 hover:bg-white/10 hover:text-white text-sm transition">
             <i class="fas fa-user w-4"></i> Profil
         </a>
