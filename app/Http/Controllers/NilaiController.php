@@ -36,16 +36,26 @@ class NilaiController extends Controller
 
     public function input(Pembelajaran $pembelajaran)
     {
-        $pembelajaran->load(['guru', 'mataPelajaran', 'kelas.siswas']);
-        $siswas = $pembelajaran->kelas->siswas()->where('status', 'Aktif')->get();
-        $tapel  = TahunPelajaran::aktif();
+        $pembelajaran->load(['guru', 'mataPelajaran', 'kelas.siswas', 'kelas.tahunPelajaran']);
 
-        // ── CEK KUNCI NILAI ──────────────────────────────────────
-        if ($tapel && $tapel->is_locked) {
+        // ── CEK STATUS PEMBELAJARAN ──────────────────────────────
+        if ($pembelajaran->status !== 'Aktif') {
             return back()->with('error',
-                '🔒 Nilai untuk tahun pelajaran "' . $tapel->nama . '" sedang dikunci oleh Kepala Sekolah. Anda tidak dapat mengedit nilai saat ini.'
+                '🔒 Pembelajaran "' . ($pembelajaran->mataPelajaran->nama ?? '-') . '" sudah tidak aktif. Anda tidak dapat menginput nilai untuk pembelajaran ini.'
             );
         }
+
+        // ── TAHUN PELAJARAN MILIK KELAS (bukan yang aktif global) ─
+        $tapel = $pembelajaran->kelas->tahunPelajaran;
+
+        // ── CEK KUNCI NILAI (dicek dari tahun pelajaran milik kelas) ──
+        if ($tapel && $tapel->is_locked) {
+            return back()->with('error',
+                '🔒 Nilai untuk tahun pelajaran "' . $tapel->nama . ' - ' . $tapel->semester . '" sedang dikunci oleh Kepala Sekolah. Anda tidak dapat mengedit nilai saat ini.'
+            );
+        }
+
+        $siswas = $pembelajaran->kelas->siswas()->where('status', 'Aktif')->get();
 
         $nilais = Nilai::where('mata_pelajaran_id', $pembelajaran->mata_pelajaran_id)
             ->where('tahun_pelajaran_id', $tapel?->id)
@@ -60,16 +70,25 @@ class NilaiController extends Controller
 
     public function simpan(Request $request)
     {
-        $tapel = TahunPelajaran::aktif();
+        $pembelajaran = Pembelajaran::with('kelas.tahunPelajaran')->findOrFail($request->pembelajaran_id);
 
-        // ── CEK KUNCI NILAI ──────────────────────────────────────
-        if ($tapel && $tapel->is_locked) {
+        // ── CEK STATUS PEMBELAJARAN ──────────────────────────────
+        if ($pembelajaran->status !== 'Aktif') {
             return back()->with('error',
-                '🔒 Nilai sedang dikunci oleh Kepala Sekolah. Anda tidak dapat menyimpan nilai saat ini.'
+                '🔒 Pembelajaran ini sudah tidak aktif. Anda tidak dapat menyimpan nilai untuk pembelajaran ini.'
             );
         }
 
-        $pembelajaran    = Pembelajaran::findOrFail($request->pembelajaran_id);
+        // ── TAHUN PELAJARAN MILIK KELAS (bukan yang aktif global) ─
+        $tapel = $pembelajaran->kelas->tahunPelajaran;
+
+        // ── CEK KUNCI NILAI (dicek dari tahun pelajaran milik kelas) ──
+        if ($tapel && $tapel->is_locked) {
+            return back()->with('error',
+                '🔒 Nilai untuk tahun pelajaran "' . $tapel->nama . ' - ' . $tapel->semester . '" sedang dikunci oleh Kepala Sekolah. Anda tidak dapat menyimpan nilai saat ini.'
+            );
+        }
+
         $mataPelajaranId = $pembelajaran->mata_pelajaran_id;
 
         foreach ($request->nilai as $siswaId => $data) {
@@ -83,7 +102,7 @@ class NilaiController extends Controller
                 [
                     'siswa_id'           => $siswaId,
                     'mata_pelajaran_id'  => $mataPelajaranId,
-                    'tahun_pelajaran_id' => $tapel->id,
+                    'tahun_pelajaran_id' => $tapel?->id,
                 ],
                 [
                     'nilai_pengetahuan'  => $np,
@@ -107,6 +126,7 @@ class NilaiController extends Controller
             ->get();
         $siswas = $kelas->siswas;
         $nilais = Nilai::whereIn('siswa_id', $siswas->pluck('id'))
+            ->where('tahun_pelajaran_id', $kelas->tahun_pelajaran_id)
             ->get()
             ->groupBy('siswa_id');
         return view('admin.nilai.akhir-detail', compact('kelas', 'pembelajarans', 'siswas', 'nilais'));

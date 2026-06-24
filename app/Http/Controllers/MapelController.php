@@ -2,7 +2,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\MataPelajaran;
-use App\Models\TahunPelajaran;
 use App\Models\Guru;
 use Illuminate\Http\Request;
 
@@ -10,35 +9,32 @@ class MapelController extends Controller
 {
     public function index()
     {
-        $mapels = MataPelajaran::with('tahunPelajaran')->latest()->paginate(15);
+        $mapels = MataPelajaran::latest()->paginate(15);
         return view('admin.mapel.index', compact('mapels'));
     }
 
     public function create()
     {
-        $tapels = TahunPelajaran::orderByDesc('id')->get();
-        $gurus  = Guru::orderBy('nama')->get();
-        return view('admin.mapel.form', compact('tapels', 'gurus'));
+        $gurus = Guru::orderBy('nama')->get();
+        return view('admin.mapel.form', compact('gurus'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'nama'               => 'required',
-            'kode'               => 'required|unique:mata_pelajarans',
-            'kkm'                => 'required|integer|min:0|max:100',
-            'tahun_pelajaran_id' => 'required',
+            'nama' => 'required',
+            'kode' => 'required|unique:mata_pelajarans',
+            'kkm'  => 'required|integer|min:0|max:100',
         ]);
 
-        MataPelajaran::create($request->only('nama', 'kode', 'kelompok', 'kkm', 'tahun_pelajaran_id', 'guru_id'));
+        MataPelajaran::create($request->only('nama', 'kode', 'kelompok', 'kkm', 'guru_id'));
         return redirect()->route('mapel.index')->with('success', 'Mapel berhasil ditambahkan!');
     }
 
     public function edit(MataPelajaran $mapel)
     {
-        $tapels = TahunPelajaran::orderByDesc('id')->get();
-        $gurus  = Guru::orderBy('nama')->get();
-        return view('admin.mapel.form', compact('tapels', 'gurus', 'mapel'));
+        $gurus = Guru::orderBy('nama')->get();
+        return view('admin.mapel.form', compact('gurus', 'mapel'));
     }
 
     public function update(Request $request, MataPelajaran $mapel)
@@ -49,7 +45,7 @@ class MapelController extends Controller
             'kkm'  => 'required|integer|min:0|max:100',
         ]);
 
-        $mapel->update($request->only('nama', 'kode', 'kelompok', 'kkm', 'tahun_pelajaran_id', 'guru_id'));
+        $mapel->update($request->only('nama', 'kode', 'kelompok', 'kkm', 'guru_id'));
         return redirect()->route('mapel.index')->with('success', 'Mapel berhasil diperbarui!');
     }
 
@@ -58,4 +54,4 @@ class MapelController extends Controller
         $mapel->delete();
         return redirect()->route('mapel.index')->with('success', 'Mapel berhasil dihapus!');
     }
-}   
+}

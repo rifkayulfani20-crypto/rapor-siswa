@@ -21,9 +21,9 @@
             <i class="fas fa-door-open"></i>
             {{ $kelas->nama }}
             <span class="text-blue-200 font-normal text-xs">
-                — {{ $kelas->tahunPelajaran->tahun_pelajaran ?? '-' }}
+                — {{ $kelas->tahunPelajaran->nama ?? '-' }}
                 &nbsp;·&nbsp;
-               Sem. {{ $kelas->tahunPelajaran->semester ?? '-' }}
+                Sem. {{ $kelas->tahunPelajaran->semester ?? '-' }}
             </span>
         </span>
         <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full">
@@ -40,7 +40,6 @@
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">NIS</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nama Siswa</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Jenis Kelamin</th>
-                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                     <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Aksi</th>
                 </tr>
             </thead>
@@ -62,13 +61,6 @@
                         @endif
                     </td>
                     <td class="px-4 py-3 text-center">
-                        @if(($siswa->status ?? 'Aktif') == 'Aktif')
-                            <span class="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">Aktif</span>
-                        @else
-                            <span class="bg-yellow-100 text-yellow-700 text-xs font-semibold px-3 py-1 rounded-full">{{ $siswa->status }}</span>
-                        @endif
-                    </td>
-                    <td class="px-4 py-3 text-center">
                         <a href="{{ route('guru.raport.cetak', $siswa->id) }}" target="_blank"
                            class="inline-flex items-center gap-1.5 bg-[#1a3a6c] hover:bg-[#122a52] text-white text-xs font-semibold px-3 py-2 rounded-lg transition-colors">
                             <i class="fas fa-print"></i> Cetak
@@ -77,7 +69,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="text-center text-gray-400 py-10">
+                    <td colspan="5" class="text-center text-gray-400 py-10">
                         <i class="fas fa-users-slash text-2xl block mb-2"></i>
                         Tidak ada siswa di kelas ini
                     </td>

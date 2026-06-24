@@ -34,7 +34,6 @@
                         <th>Kode</th>
                         <th>Kelompok</th>
                         <th>KKM</th>
-                        <th>Tahun Pelajaran</th>
                         <th width="120">Aksi</th>
                     </tr>
                 </thead>
@@ -46,7 +45,6 @@
                         <td>{{ $mapel->kode }}</td>
                         <td>{{ $mapel->kelompok ?? '-' }}</td>
                         <td>{{ $mapel->kkm }}</td>
-                        <td>{{ $mapel->tahunPelajaran->nama ?? '-' }} {{ $mapel->tahunPelajaran->semester ?? '' }}</td>
                         <td>
                             <div style="display:flex;gap:4px;">
                                 <a href="{{ route('mapel.edit', $mapel->id) }}" class="btn btn-primary btn-sm" title="Edit">
@@ -66,7 +64,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" style="text-align:center;color:#7f8c8d;padding:40px">
+                        <td colspan="6" style="text-align:center;color:#7f8c8d;padding:40px">
                             <i class="fa fa-inbox fa-2x"></i><br><br>Belum ada data mata pelajaran
                         </td>
                     </tr>

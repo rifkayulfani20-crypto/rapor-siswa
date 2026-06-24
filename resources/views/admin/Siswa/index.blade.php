@@ -116,11 +116,21 @@
 
 @push('scripts')
 <script>
+let searchTimeout;
 function liveSearch(keyword) {
-    keyword = keyword.toLowerCase();
-    document.querySelectorAll('#siswaTable tbody tr').forEach(row => {
-        row.style.display = row.textContent.toLowerCase().includes(keyword) ? '' : 'none';
-    });
+    // Debounce: tunggu 500ms setelah user berhenti mengetik,
+    // baru kirim kata kunci ke server lewat query string ?search=...
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        const url = new URL(window.location.href);
+        if (keyword) {
+            url.searchParams.set('search', keyword);
+        } else {
+            url.searchParams.delete('search');
+        }
+        url.searchParams.set('page', 1); // reset ke halaman 1 tiap kali keyword berubah
+        window.location.href = url.toString();
+    }, 500);
 }
 
 function changePerPage(val) {

@@ -29,12 +29,16 @@ class DashboardController extends Controller
                 ? round($nilaiSudahDiinput / ($totalSiswa * $totalMapel) * 100)
                 : 0;
 
-            // Data siswa per kelas untuk chart
+            // Data siswa per kelas untuk chart, diurutkan per tingkat lalu nama
+            // supaya kelas dalam tingkat yang sama berdekatan dan mudah dibandingkan
             $siswaPerKelas = Kelas::withCount(['siswas' => fn($q) => $q->where('status', 'Aktif')])
+                ->orderBy('tingkat')
+                ->orderBy('nama')
                 ->get()
                 ->map(fn($k) => [
-                    'nama'  => $k->nama,
-                    'total' => $k->siswas_count,
+                    'nama'    => $k->nama,
+                    'tingkat' => $k->tingkat,
+                    'total'   => $k->siswas_count,
                 ]);
 
             return view('dashboard.index', [

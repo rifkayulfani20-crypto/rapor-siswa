@@ -53,23 +53,8 @@
                     @error('kkm') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
-                {{-- Tahun Pelajaran --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-600 mb-1">Tahun Pelajaran <span class="text-red-500">*</span></label>
-                    <select name="tahun_pelajaran_id"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" required>
-                        <option value="">-- Pilih Tahun Pelajaran --</option>
-                        @foreach($tapels as $tapel)
-                            <option value="{{ $tapel->id }}" {{ old('tahun_pelajaran_id', $mapel->tahun_pelajaran_id ?? '') == $tapel->id ? 'selected' : '' }}>
-                                {{ $tapel->nama }} - {{ $tapel->semester }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('tahun_pelajaran_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                </div>
-
                 {{-- Guru --}}
-                <div>
+                <div class="col-span-2">
                     <label class="block text-sm font-medium text-gray-600 mb-1">Guru Pengampu</label>
                     <select name="guru_id"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">

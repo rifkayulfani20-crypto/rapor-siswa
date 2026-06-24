@@ -91,7 +91,7 @@
         thead th { padding: 10px 13px; text-align: left; font-weight: 600; font-size: 12px; }
         tbody tr { border-bottom: 1px solid #f0f0f0; transition: all 0.2s ease; }
         tbody tr:last-child { border-bottom: none; }
-        tbody tr:hover { background: #f0f4fb; transform: translateX(3px); }
+        tbody tr:hover { background: #f0f4fb; }
         tbody td { padding: 9px 13px; vertical-align: middle; color: #444; }
         .badge { padding: 3px 9px; border-radius: 12px; font-size: 11px; font-weight: 600; }
         .badge-success { background: #eafaf1; color: #1e8449; }

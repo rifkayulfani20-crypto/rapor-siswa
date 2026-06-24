@@ -1,6 +1,5 @@
 @extends('layouts.app')
 @section('title', isset($item) ? 'Edit Pembelajaran' : 'Tambah Pembelajaran')
-@section('page-title', isset($item) ? 'Edit Pembelajaran' : 'Tambah Pembelajaran')
 @section('content')
 
 <div class="page-title">{{ isset($item) ? 'Edit Pembelajaran' : 'Tambah Pembelajaran' }}</div>
@@ -40,10 +39,27 @@
                 @error('guru_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
 
+            {{-- Tahun Pelajaran (dipindah ke atas agar jelas) --}}
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Tahun Pelajaran *</label>
+                <select name="tahun_pelajaran_id" id="tahun_pelajaran_id"
+                    class="form-control @error('tahun_pelajaran_id') is-invalid @enderror" required>
+                    <option value="">-- Pilih Tahun Pelajaran --</option>
+                    @foreach($tapels as $tapel)
+                    <option value="{{ $tapel->id }}"
+                        {{ old('tahun_pelajaran_id', $item->tahun_pelajaran_id ?? '') == $tapel->id ? 'selected' : '' }}>
+                        {{ $tapel->nama }} {{ $tapel->semester }}{{ $tapel->aktif ? ' ✓ Aktif' : '' }}
+                    </option>
+                    @endforeach
+                </select>
+                @error('tahun_pelajaran_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            </div>
+
             {{-- Mata Pelajaran --}}
             <div class="mb-3">
                 <label class="form-label fw-semibold">Mata Pelajaran *</label>
-                <select name="mata_pelajaran_id" class="form-control @error('mata_pelajaran_id') is-invalid @enderror" required>
+                <select name="mata_pelajaran_id" id="mata_pelajaran_id"
+                    class="form-control @error('mata_pelajaran_id') is-invalid @enderror" required>
                     <option value="">-- Pilih Mata Pelajaran --</option>
                     @foreach($mapels as $mapel)
                     <option value="{{ $mapel->id }}"
@@ -70,28 +86,9 @@
                 @error('kelas_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
 
-            {{-- Tahun Pelajaran --}}
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Tahun Pelajaran *</label>
-                <select name="tahun_pelajaran_id" class="form-control @error('tahun_pelajaran_id') is-invalid @enderror" required>
-                    <option value="">-- Pilih Tahun Pelajaran --</option>
-                    @foreach($tapels as $tapel)
-                    <option value="{{ $tapel->id }}"
-                        {{ old('tahun_pelajaran_id', $item->tahun_pelajaran_id ?? '') == $tapel->id ? 'selected' : '' }}>
-                        {{ $tapel->nama }}{{ $tapel->aktif ? ' (Aktif)' : '' }}
-                    </option>
-                    @endforeach
-                </select>
-                @error('tahun_pelajaran_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
-            </div>
-
-            {{-- Status --}}
-            <div class="mb-4">
-                <label class="form-label fw-semibold">Status</label>
-                <select name="status" class="form-control">
-                    <option value="Aktif"    {{ old('status', $item->status ?? 'Aktif') == 'Aktif'    ? 'selected' : '' }}>Aktif</option>
-                    <option value="Nonaktif" {{ old('status', $item->status ?? '')      == 'Nonaktif' ? 'selected' : '' }}>Nonaktif</option>
-                </select>
+            {{-- Info status otomatis --}}
+            <div class="mb-4" style="background:#f0f4ff;border:1px solid #c7d4f0;border-radius:8px;padding:10px 14px;font-size:13px;color:#2c3e50;">
+                <i class="fa fa-info-circle"></i> Status pembelajaran otomatis mengikuti status tahun pelajaran yang dipilih.
             </div>
 
             {{-- Tombol --}}

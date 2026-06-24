@@ -6,13 +6,31 @@
 
 <div class="card">
     <div class="card-body">
+
+        {{-- Filter Tahun Pelajaran --}}
+        <div style="margin-bottom:16px;">
+            <form method="GET" action="{{ route('pembelajaran.index') }}" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <label style="font-size:13px;font-weight:600;color:#2c3e50;">Filter Tahun Pelajaran:</label>
+                <select name="tahun_pelajaran_id" onchange="this.form.submit()" style="padding:6px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
+                    <option value="">-- Semua --</option>
+                    @foreach($tapels as $tapel)
+                        <option value="{{ $tapel->id }}"
+                            {{ request('tahun_pelajaran_id') == $tapel->id ? 'selected' : '' }}>
+                            {{ $tapel->nama }} {{ $tapel->semester }}
+                        </option>
+                    @endforeach
+                </select>
+               
+            </form>
+        </div>
+
         <div class="table-toolbar">
             <div style="display:flex; align-items:center; gap:10px;">
                 <a href="{{ route('pembelajaran.create') }}" class="btn btn-primary btn-sm">
                     <i class="fa fa-plus"></i> Pembelajaran
                 </a>
                 <label class="small">Tampilkan
-                    <select class="per-page" onchange="window.location='{{ route('pembelajaran.index') }}?per_page='+this.value">
+                    <select class="per-page" onchange="changePerPage(this.value)">
                         @foreach([10,25,50,100] as $n)
                             <option value="{{ $n }}" {{ request('per_page',10)==$n ? 'selected' : '' }}>{{ $n }}</option>
                         @endforeach
@@ -74,9 +92,14 @@
             </table>
         </div>
 
-        <div style="margin-top:12px;">
+        <div style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+            <div style="font-size:12px;color:#7f8c8d;">
+                Menampilkan {{ $pembelajaran->firstItem() ?? 0 }}–{{ $pembelajaran->lastItem() ?? 0 }}
+                dari {{ $pembelajaran->total() }} data
+            </div>
             {{ $pembelajaran->appends(request()->query())->links() }}
         </div>
+
     </div>
 </div>
 
@@ -88,6 +111,12 @@ document.getElementById('cari').addEventListener('keyup', function () {
         r.style.display = r.textContent.toLowerCase().includes(v) ? '' : 'none';
     });
 });
+function changePerPage(val) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('per_page', val);
+    url.searchParams.set('page', 1);
+    window.location.href = url.toString();
+}
 </script>
 @endpush
 

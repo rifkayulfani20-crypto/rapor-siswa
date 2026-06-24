@@ -73,7 +73,6 @@ class DashboardGuruController extends Controller
         ]);
     }
 
-    // ── Profil ───────────────────────────────────────────────────
     public function profil()
     {
         return view('guru-panel.profil');
@@ -94,7 +93,6 @@ class DashboardGuruController extends Controller
         ]);
 
         if ($request->filled('password')) {
-            // Cek password lama
             if (!$request->filled('password_lama') || !Hash::check($request->password_lama, $user->password)) {
                 return back()
                     ->withErrors(['password_lama' => 'Password lama tidak sesuai.'])
@@ -111,14 +109,12 @@ class DashboardGuruController extends Controller
         return back()->with('success', 'Profil berhasil diperbarui!');
     }
 
-    // ── Siswa ────────────────────────────────────────────────────
     public function siswaIndex()
     {
         $siswas = Siswa::with('kelas')->get();
         return view('guru-panel.siswa.index', compact('siswas'));
     }
 
-    // ── Wali Kelas ───────────────────────────────────────────────
     public function kelasIndex()
     {
         $guruId = $this->getGuruId();
@@ -134,7 +130,6 @@ class DashboardGuruController extends Controller
         return view('guru-panel.walikelas.kelas-siswa', compact('kelas'));
     }
 
-    // ── Nilai Sosial ─────────────────────────────────────────────
     public function nilaiSosialIndex()
     {
         $guruId = $this->getGuruId();
@@ -147,12 +142,21 @@ class DashboardGuruController extends Controller
     public function nilaiSosialEdit($kelas)
     {
         $kelas = Kelas::with(['waliKelas', 'tahunPelajaran', 'siswas'])->findOrFail($kelas);
-        return view('guru-panel.walikelas.nilaisosial-edit', compact('kelas'));
+        $tapel = $kelas->tahunPelajaran;
+        return view('guru-panel.walikelas.nilaisosial-edit', compact('kelas', 'tapel'));
     }
 
     public function nilaiSosialUpdate(Request $request, $kelas)
     {
         $kelasModel = Kelas::with('tahunPelajaran')->findOrFail($kelas);
+        $tapel = $kelasModel->tahunPelajaran;
+
+        if ($tapel && $tapel->is_locked) {
+            return back()->with('error',
+                '🔒 Nilai untuk tahun pelajaran "' . $tapel->nama . ' - ' . $tapel->semester . '" sedang dikunci oleh Kepala Sekolah.'
+            );
+        }
+
         foreach ($request->siswa_id as $i => $siswaId) {
             SikapSiswa::updateOrCreate(
                 [
@@ -169,7 +173,6 @@ class DashboardGuruController extends Controller
         return back()->with('success', 'Nilai sosial berhasil disimpan!');
     }
 
-    // ── Nilai Spiritual ──────────────────────────────────────────
     public function nilaiSpiritualIndex()
     {
         $guruId = $this->getGuruId();
@@ -182,12 +185,21 @@ class DashboardGuruController extends Controller
     public function nilaiSpiritualEdit($kelas)
     {
         $kelas = Kelas::with(['waliKelas', 'tahunPelajaran', 'siswas'])->findOrFail($kelas);
-        return view('guru-panel.walikelas.nilaispiritual-edit', compact('kelas'));
+        $tapel = $kelas->tahunPelajaran;
+        return view('guru-panel.walikelas.nilaispiritual-edit', compact('kelas', 'tapel'));
     }
 
     public function nilaiSpiritualUpdate(Request $request, $kelas)
     {
         $kelasModel = Kelas::with('tahunPelajaran')->findOrFail($kelas);
+        $tapel = $kelasModel->tahunPelajaran;
+
+        if ($tapel && $tapel->is_locked) {
+            return back()->with('error',
+                '🔒 Nilai untuk tahun pelajaran "' . $tapel->nama . ' - ' . $tapel->semester . '" sedang dikunci oleh Kepala Sekolah.'
+            );
+        }
+
         foreach ($request->siswa_id as $i => $siswaId) {
             SikapSiswa::updateOrCreate(
                 [
@@ -204,7 +216,6 @@ class DashboardGuruController extends Controller
         return back()->with('success', 'Nilai spiritual berhasil disimpan!');
     }
 
-    // ── Ketidakhadiran ───────────────────────────────────────────
     public function ketidakhadiranIndex()
     {
         $guruId = $this->getGuruId();
@@ -217,16 +228,25 @@ class DashboardGuruController extends Controller
     public function ketidakhadiranEdit($kelas)
     {
         $kelas = Kelas::with(['waliKelas', 'tahunPelajaran', 'siswas'])->findOrFail($kelas);
+        $tapel = $kelas->tahunPelajaran;
         $ketidakhadiranData = Kehadiran::where('tahun_pelajaran_id', $kelas->tahun_pelajaran_id)
                         ->whereIn('siswa_id', $kelas->siswas->pluck('id'))
                         ->get()
                         ->keyBy('siswa_id');
-        return view('guru-panel.walikelas.ketidakhadiran-edit', compact('kelas', 'ketidakhadiranData'));
+        return view('guru-panel.walikelas.ketidakhadiran-edit', compact('kelas', 'ketidakhadiranData', 'tapel'));
     }
 
     public function ketidakhadiranUpdate(Request $request, $kelas)
     {
         $kelasModel = Kelas::with(['tahunPelajaran', 'siswas'])->findOrFail($kelas);
+        $tapel = $kelasModel->tahunPelajaran;
+
+        if ($tapel && $tapel->is_locked) {
+            return back()->with('error',
+                '🔒 Data untuk tahun pelajaran "' . $tapel->nama . ' - ' . $tapel->semester . '" sedang dikunci oleh Kepala Sekolah.'
+            );
+        }
+
         foreach ($request->siswa_id as $i => $siswaId) {
             Kehadiran::updateOrCreate(
                 [
@@ -244,7 +264,6 @@ class DashboardGuruController extends Controller
             ->with('success', 'Data ketidakhadiran berhasil disimpan!');
     }
 
-    // ── Catatan ──────────────────────────────────────────────────
     public function catatanIndex()
     {
         $guruId = $this->getGuruId();
@@ -262,10 +281,17 @@ class DashboardGuruController extends Controller
 
     public function catatanUpdate($kelas)
     {
+        $kelasModel = Kelas::with('tahunPelajaran')->findOrFail($kelas);
+        $tapel = $kelasModel->tahunPelajaran;
+
+        if ($tapel && $tapel->is_locked) {
+            return back()->with('error',
+                '🔒 Data untuk tahun pelajaran "' . $tapel->nama . ' - ' . $tapel->semester . '" sedang dikunci oleh Kepala Sekolah.'
+            );
+        }
         return back();
     }
 
-    // ── Nilai Mapel ──────────────────────────────────────────────
     public function nilaiMapelIndex()
     {
         $guruId = $this->getGuruId();
@@ -280,7 +306,6 @@ class DashboardGuruController extends Controller
         return view('guru-panel.ekskul.nilai');
     }
 
-    // ── Nilai Akhir ──────────────────────────────────────────────
     public function nilaiAkhir()
     {
         $guruId = $this->getGuruId();
@@ -298,42 +323,45 @@ class DashboardGuruController extends Controller
             ->get();
         $siswas = $kelas->siswas;
         $nilais = Nilai::whereIn('siswa_id', $siswas->pluck('id'))
+            ->where('tahun_pelajaran_id', $kelas->tahun_pelajaran_id)
             ->get()
             ->groupBy('siswa_id');
         return view('guru-panel.nilaiakhir-detail', compact('kelas', 'pembelajarans', 'siswas', 'nilais'));
     }
 
-    // ── Raport ───────────────────────────────────────────────────
     public function raport()
     {
         $guruId = $this->getGuruId();
         $kelass = Kelas::with(['waliKelas', 'tahunPelajaran', 'siswas'])
             ->where('wali_kelas_id', $guruId)
             ->get();
-        $tapel = TahunPelajaran::aktif();
-        return view('guru-panel.raport', compact('kelass', 'tapel'));
+        return view('guru-panel.raport', compact('kelass'));
     }
 
     public function raportCetak(\App\Models\Siswa $siswa)
     {
-        $tapel = TahunPelajaran::aktif();
+        $siswa->load('kelas.tahunPelajaran');
+        $tapel = $siswa->kelas->tahunPelajaran;
+
         $nilais = Nilai::with('mataPelajaran')
             ->where('siswa_id', $siswa->id)
-            ->when($tapel, fn($q) => $q->where('tahun_pelajaran_id', $tapel->id))
+            ->where('tahun_pelajaran_id', $tapel->id)
             ->get();
+
         $sikap = SikapSiswa::where('siswa_id', $siswa->id)
             ->where('kelas_id', $siswa->kelas_id)
-            ->when($tapel, fn($q) => $q->where('tahun_pelajaran_id', $tapel->id))
+            ->where('tahun_pelajaran_id', $tapel->id)
             ->first();
+
         $kehadiran = Kehadiran::where('siswa_id', $siswa->id)
-            ->when($tapel, fn($q) => $q->where('tahun_pelajaran_id', $tapel->id))
+            ->where('tahun_pelajaran_id', $tapel->id)
             ->first();
 
         $semuaSiswaKelas = Siswa::where('kelas_id', $siswa->kelas_id)->pluck('id');
         $rataRataSiswa = [];
         foreach ($semuaSiswaKelas as $sid) {
             $avg = Nilai::where('siswa_id', $sid)
-                ->when($tapel, fn($q) => $q->where('tahun_pelajaran_id', $tapel->id))
+                ->where('tahun_pelajaran_id', $tapel->id)
                 ->avg('nilai_akhir');
             $rataRataSiswa[$sid] = $avg ?? 0;
         }
@@ -347,4 +375,4 @@ class DashboardGuruController extends Controller
             'peringkat', 'totalSiswa', 'rataRata'
         ));
     }
-}   
+}

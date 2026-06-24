@@ -94,9 +94,9 @@
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
         thead { background: #1a3a6c; color: white; }
         thead th { padding: 10px 13px; text-align: left; font-weight: 600; font-size: 12px; }
-        tbody tr { border-bottom: 1px solid #f0f0f0; transition: all 0.2s ease; }
+        tbody tr { border-bottom: 1px solid #f0f0f0; transition: background 0.2s ease; }
         tbody tr:last-child { border-bottom: none; }
-        tbody tr:hover { background: #f0f4fb; transform: translateX(3px); }
+        tbody tr:hover { background: #f0f4fb; }
         tbody td { padding: 9px 13px; vertical-align: middle; color: #444; }
 
         .badge { padding: 3px 9px; border-radius: 12px; font-size: 11px; font-weight: 600; }
@@ -248,16 +248,18 @@
         </div>
         <div class="topbar-right">
             <div class="user-info">
-                <span class="user-name">{{ auth()->user()->name }}</span>
+                <span class="user-name">{{ auth()->user()?->name ?? 'Guest' }}</span>
                 <span class="user-role">Administrator</span>
             </div>
-            <div class="avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
+            <div class="avatar">{{ auth()->user() ? strtoupper(substr(auth()->user()->name, 0, 1)) : '?' }}</div>
+            @auth
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="btn-logout">
                     <i class="fa fa-sign-out-alt"></i> Keluar
                 </button>
             </form>
+            @endauth
         </div>
     </header>
 

@@ -87,7 +87,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/admin/dataakun/{akun}/edit', [AkunController::class, 'edit'])->name('admin.akun.edit');
         Route::put('/admin/dataakun/{akun}', [AkunController::class, 'update'])->name('admin.akun.update');
 
-        // Kepsek (admin kelola data kepsek)
+        // Kepsek
         Route::get('/admin/kepsek', [KepsekAdminController::class, 'index'])->name('admin.kepsek.index');
         Route::get('/admin/kepsek/create', [KepsekAdminController::class, 'create'])->name('admin.kepsek.create');
         Route::post('/admin/kepsek', [KepsekAdminController::class, 'store'])->name('admin.kepsek.store');
@@ -147,7 +147,8 @@ Route::middleware(['auth'])->group(function () {
         // Raport Admin
         Route::get('/admin/raport', [RaportController::class, 'index'])->name('raport.index');
         Route::get('/admin/raport/cetak/{siswa}', [RaportController::class, 'cetak'])->name('raport.cetak');
-    });
+
+    }); // ← tutup group ADMIN ONLY
 
     // ==================== ADMIN & GURU ====================
     Route::middleware(['role:admin,guru'])->group(function () {
@@ -202,7 +203,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/profil',    [DashboardSiswaController::class, 'profil'])->name('profil');
         Route::put('/profil/password', [DashboardSiswaController::class, 'gantiPassword'])->name('profil.password');
 
-        // Raport Siswa
         Route::get('/raport',       [SiswaRaportController::class, 'index'])->name('raport');
         Route::get('/raport/cetak', [SiswaRaportController::class, 'cetak'])->name('raport.cetak');
     });
@@ -218,4 +218,4 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/profil', [KepsekController::class, 'profilUpdate'])->name('profil.update');
     });
 
-});
+}); 

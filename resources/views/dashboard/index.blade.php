@@ -92,36 +92,36 @@
 
 </div>
 
-{{-- Chart: Rekap Data --}}
-<div class="card">
-    <div class="card-header">
-        <span style="font-weight:600;font-size:13px;color:#1a3a6c;">
-            <i class="fa fa-chart-line"></i> Rekap Data Sekolah
-        </span>
-    </div>
-    <div class="card-body">
-        <canvas id="chartRekap" height="100"></canvas>
-    </div>
-</div>
-
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     // ── Data dari Laravel ──
     const siswaPerKelas = @json($siswa_per_kelas ?? []);
-    const totalSiswa    = {{ $total_siswa }};
-    const totalGuru     = {{ $total_guru }};
-    const totalMapel    = {{ $total_mapel }};
-    const totalKelas    = {{ $total_kelas }};
     const persen        = {{ $persen }};
 
     const labels = siswaPerKelas.map(k => k.nama);
     const counts = siswaPerKelas.map(k => k.total);
+    const tingkatList = siswaPerKelas.map(k => k.tingkat);
 
-    const colors = [
-        '#1a3a6c','#1e4d8c','#2563a8','#3b82c4',
-        '#60a5e0','#93c5f8','#bfdbfe','#dbeafe'
-    ];
+    // ── Warna dikelompokkan per tingkat, bukan per kelas ──
+    // Tiap tingkat (VII, VIII, IX, dst) dapat 1 warna dasar yang sama,
+    // jadi kelas A/B/C dalam tingkat yang sama langsung terlihat satu kelompok.
+    const tingkatPalette = {
+        'VII':  '#1a3a6c',
+        'VIII': '#1e4d8c',
+        'IX':   '#2563a8',
+        'X':    '#3b82c4',
+        'XI':   '#60a5e0',
+        'XII':  '#93c5f8',
+    };
+    const fallbackPalette = ['#1a3a6c','#1e4d8c','#2563a8','#3b82c4','#60a5e0','#93c5f8'];
+    const uniqueTingkat = [...new Set(tingkatList)];
+
+    const colors = tingkatList.map(t => {
+        if (tingkatPalette[t]) return tingkatPalette[t];
+        const idx = uniqueTingkat.indexOf(t);
+        return fallbackPalette[idx % fallbackPalette.length];
+    });
 
     // ── Chart 1: Bar - Siswa per Kelas ──
     new Chart(document.getElementById('chartSiswaKelas'), {
@@ -142,6 +142,10 @@
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
+                        title: ctx => {
+                            const i = ctx[0].dataIndex;
+                            return tingkatList[i] ? `Kelas ${tingkatList[i]} ${ctx[0].label}` : ctx[0].label;
+                        },
                         label: ctx => ` ${ctx.raw} siswa`
                     }
                 }
@@ -153,7 +157,12 @@
                     grid: { color: '#f0f0f0' }
                 },
                 x: {
-                    grid: { display: false }
+                    grid: { display: false },
+                    ticks: {
+                        autoSkip: false,
+                        maxRotation: labels.length > 8 ? 60 : 0,
+                        minRotation: labels.length > 8 ? 60 : 0,
+                    }
                 }
             }
         }
@@ -199,43 +208,6 @@
                 ctx.restore();
             }
         }]
-    });
-
-    // ── Chart 3: Bar Horizontal - Rekap Data ──
-    new Chart(document.getElementById('chartRekap'), {
-        type: 'bar',
-        data: {
-            labels: ['Siswa', 'Guru', 'Mata Pelajaran', 'Kelas'],
-            datasets: [{
-                label: 'Total',
-                data: [totalSiswa, totalGuru, totalMapel, totalKelas],
-                backgroundColor: ['#1a3a6c','#1e4d8c','#2563a8','#3b82c4'],
-                borderRadius: 6,
-                borderSkipped: false,
-            }]
-        },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: ctx => ` ${ctx.raw}`
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    beginAtZero: true,
-                    ticks: { stepSize: 1 },
-                    grid: { color: '#f0f0f0' }
-                },
-                y: {
-                    grid: { display: false }
-                }
-            }
-        }
     });
 </script>
 @endpush
