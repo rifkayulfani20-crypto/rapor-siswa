@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
     <html lang="id">
     <head>
         <meta charset="UTF-8">
@@ -175,6 +175,10 @@
 
             <a href="{{ route('kepsek.nilai.akhir') }}" class="menu-item {{ request()->routeIs('kepsek.nilai.akhir*') ? 'active' : '' }}">
                 <i class="fa fa-star icon"></i> Nilai Akhir
+            </a>
+
+            <a href="{{ route('kepsek.kunci.nilai') }}" class="menu-item {{ request()->routeIs('kepsek.kunci.nilai') ? 'active' : '' }}">
+                <i class="fa fa-lock icon"></i> Kunci Nilai
             </a>
 
             <div class="menu-label">Akun</div>
