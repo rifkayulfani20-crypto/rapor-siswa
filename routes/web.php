@@ -210,6 +210,7 @@ Route::middleware(['auth'])->group(function () {
     // ==================== KEPSEK ONLY ====================
     Route::middleware(['role:kepsek'])->prefix('kepsek')->name('kepsek.')->group(function () {
         Route::get('/dashboard', [KepsekController::class, 'dashboard'])->name('dashboard');
+        Route::get('/kunci-nilai', [KepsekController::class, 'kunciNilai'])->name('kunci.nilai');
         Route::get('/nilaiakhir', [KepsekController::class, 'nilaiAkhir'])->name('nilai.akhir');
         Route::get('/nilaiakhir/{id}', [KepsekController::class, 'nilaiAkhirDetail'])->name('nilai.akhir.detail');
         Route::post('/tapel/{tapel}/lock', [KepsekController::class, 'lockTapel'])->name('tapel.lock');
@@ -218,4 +219,4 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/profil', [KepsekController::class, 'profilUpdate'])->name('profil.update');
     });
 
-}); 
+});

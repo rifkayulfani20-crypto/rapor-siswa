@@ -35,6 +35,14 @@ class KepsekController extends Controller
         return view('kepsek.dashboard', compact('tapels', 'tapelAktif', 'totalKelas', 'totalSiswa', 'grafikKelas'));
     }
 
+    public function kunciNilai()
+    {
+        $tapels     = TahunPelajaran::withCount('kelas')->latest()->get();
+        $tapelAktif = TahunPelajaran::aktif();
+
+        return view('kepsek.kunci-nilai', compact('tapels', 'tapelAktif'));
+    }
+
     public function nilaiAkhir()
     {
         $tapel = TahunPelajaran::aktif();
