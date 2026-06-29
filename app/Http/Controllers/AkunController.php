@@ -7,9 +7,26 @@ use Illuminate\Support\Facades\Hash;
 
 class AkunController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $akuns = User::latest()->paginate(10);
+        $query = User::query();
+
+        if ($request->filled('role')) {
+            $query->where('role', $request->role);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                  ->orWhere('email', 'like', "%$search%");
+            });
+        }
+
+        $akuns = $query->latest()
+                       ->paginate($request->get('per_page', 10))
+                       ->withQueryString();
+
         return view('admin.akun.index', compact('akuns'));
     }
 
@@ -32,5 +49,20 @@ class AkunController extends Controller
         }
 
         return redirect()->route('admin.akun.index')->with('success', 'Data akun berhasil diperbarui!');
+    }
+
+    public function updateRole(Request $request, User $akun)
+    {
+        $request->validate([
+            'role' => ['required', 'in:admin,guru,siswa,kepsek'],
+        ]);
+
+        if ($akun->id === auth()->id()) {
+            return back()->with('error', 'Tidak bisa mengubah role akun sendiri.');
+        }
+
+        $akun->update(['role' => $request->role]);
+
+        return back()->with('success', 'Role ' . $akun->name . ' berhasil diubah ke ' . strtoupper($request->role) . '.');
     }
 }

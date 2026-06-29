@@ -14,16 +14,39 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
+        $request->validate([
+            'role'     => 'required|in:admin,guru,siswa,kepsek',
             'email'    => 'required|email',
             'password' => 'required',
         ]);
 
+        $credentials = $request->only('email', 'password');
+
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
-            $role = Auth::user()->role;
+            $role         = Auth::user()->role;   // role asli di database
+            $selectedRole = $request->role;        // role yang dipilih di dropdown
 
+            // Pasangan role yang boleh saling login (cross-login)
+            // Contoh: akun kepsek boleh login walau pilih "guru", dan sebaliknya.
+            $crossAllowed = [
+                'guru'   => 'kepsek',
+                'kepsek' => 'guru',
+            ];
+
+            $isMismatch = $role !== $selectedRole;
+            $isCrossAllowed = $isMismatch
+                && isset($crossAllowed[$role])
+                && $crossAllowed[$role] === $selectedRole;
+
+            // Kalau role tidak cocok DAN bukan pasangan yang diizinkan -> tolak
+            if ($isMismatch && !$isCrossAllowed) {
+                Auth::logout();
+                return back()->withErrors(['email' => 'Role yang dipilih tidak sesuai dengan akun ini.'])->onlyInput('email');
+            }
+
+            // Redirect selalu berdasarkan role ASLI di database, bukan yang dipilih di dropdown
             if ($role === 'admin') {
                 return redirect()->route('dashboard');
             } elseif ($role === 'guru') {

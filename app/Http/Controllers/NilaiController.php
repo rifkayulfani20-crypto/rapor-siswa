@@ -96,7 +96,7 @@ class NilaiController extends Controller
             $nk  = $data['keterampilan'] ?? 0;
             $pts = $data['pts']          ?? 0;
             $pas = $data['pas']          ?? 0;
-            $na  = round(($np + $nk + $pts + $pas) / 4, 2);
+            $na = round(($np * 0.25) + ($nk * 0.25) + ($pts * 0.25) + ($pas * 0.25), 2);
 
             Nilai::updateOrCreate(
                 [
@@ -124,7 +124,7 @@ class NilaiController extends Controller
         $pembelajarans = Pembelajaran::with('mataPelajaran')
             ->where('kelas_id', $id)
             ->get();
-        $siswas = $kelas->siswas;
+        $siswas = $kelas->siswas()->where('status', 'Aktif')->get();
         $nilais = Nilai::whereIn('siswa_id', $siswas->pluck('id'))
             ->where('tahun_pelajaran_id', $kelas->tahun_pelajaran_id)
             ->get()

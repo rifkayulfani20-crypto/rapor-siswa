@@ -86,6 +86,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/admin/dataakun', [AkunController::class, 'index'])->name('admin.akun.index');
         Route::get('/admin/dataakun/{akun}/edit', [AkunController::class, 'edit'])->name('admin.akun.edit');
         Route::put('/admin/dataakun/{akun}', [AkunController::class, 'update'])->name('admin.akun.update');
+        Route::patch('/admin/dataakun/{akun}/role', [AkunController::class, 'updateRole'])->name('admin.akun.updateRole');
+        
 
         // Kepsek
         Route::get('/admin/kepsek', [KepsekAdminController::class, 'index'])->name('admin.kepsek.index');
