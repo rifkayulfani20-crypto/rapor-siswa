@@ -13,12 +13,21 @@
     </div>
     <div class="card-body">
 
-        <div class="table-toolbar">
-            <div style="display:flex;align-items:center;gap:8px;">
+        <div class="table-toolbar" style="flex-wrap:wrap;gap:10px;">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                 <select class="per-page" onchange="changePerPage(this.value)">
                     <option value="10" {{ request('per_page',10)==10?'selected':'' }}>10</option>
                     <option value="25" {{ request('per_page',10)==25?'selected':'' }}>25</option>
                     <option value="50" {{ request('per_page',10)==50?'selected':'' }}>50</option>
+                </select>
+
+                <select class="form-control" style="min-width:220px;" onchange="filterTapel(this.value)">
+                    <option value="">Semua Tahun Ajaran</option>
+                    @foreach($tapelList as $t)
+                        <option value="{{ $t->id }}" {{ (string) $tapelFilterId === (string) $t->id ? 'selected' : '' }}>
+                            {{ $t->nama }} {{ $t->semester }} {{ $t->aktif ? '(Aktif)' : '' }}
+                        </option>
+                    @endforeach
                 </select>
             </div>
             <input type="text" class="search-box" placeholder="Search..." id="searchInput"
@@ -40,13 +49,19 @@
                 </thead>
                 <tbody>
                     @forelse($kelas as $i => $k)
-                    <tr>
+                    <tr @if($k->siswas_count === 0) style="opacity:0.55;" @endif>
                         <td>{{ $kelas->firstItem() + $i }}</td>
                         <td>{{ $k->nama }}</td>
                         <td>{{ $k->tingkat }}</td>
                         <td>{{ $k->waliKelas->nama ?? '-' }}</td>
                         <td>{{ $k->tahunPelajaran->nama ?? '-' }} {{ $k->tahunPelajaran->semester ?? '' }}</td>
-                        <td>{{ $k->siswas_count }} siswa</td>
+                        <td>
+                            @if($k->siswas_count === 0)
+                                <span style="display:inline-block;padding:2px 10px;border-radius:10px;background:#f1f5f9;color:#94a3b8;font-size:12px;">Kosong</span>
+                            @else
+                                {{ $k->siswas_count }} siswa
+                            @endif
+                        </td>
                         <td>
                             <div style="display:flex;gap:4px;">
                                 <a href="{{ route('kelas.edit', $k->id) }}" class="btn btn-primary btn-sm" title="Edit">
@@ -100,6 +115,16 @@ function liveSearch(keyword) {
 function changePerPage(val) {
     const url = new URL(window.location.href);
     url.searchParams.set('per_page', val);
+    url.searchParams.set('page', 1);
+    window.location.href = url.toString();
+}
+function filterTapel(val) {
+    const url = new URL(window.location.href);
+    if (val) {
+        url.searchParams.set('tapel_id', val);
+    } else {
+        url.searchParams.delete('tapel_id');
+    }
     url.searchParams.set('page', 1);
     window.location.href = url.toString();
 }

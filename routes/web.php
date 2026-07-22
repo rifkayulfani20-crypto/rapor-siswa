@@ -8,6 +8,7 @@ use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\MapelController;
 use App\Http\Controllers\TahunPelajaranController;
+use App\Http\Controllers\KenaikanKelasController;
 use App\Http\Controllers\PembelajaranController;
 use App\Http\Controllers\NilaiController;
 use App\Http\Controllers\RaportController;
@@ -53,6 +54,9 @@ Route::middleware(['auth'])->group(function () {
             ]);
 
         Route::get('admin/datasiswa/{siswa}', [SiswaController::class, 'show'])->name('siswa.show');
+        Route::get('admin/datasiswa-import/template', [SiswaController::class, 'downloadTemplate'])->name('siswa.import.template');
+        Route::post('admin/datasiswa-import', [SiswaController::class, 'import'])->name('siswa.import');
+        Route::get('admin/datasiswa-export', [SiswaController::class, 'export'])->name('siswa.export');
 
         // Guru
         Route::resource('admin/dataguru', GuruController::class)
@@ -68,6 +72,9 @@ Route::middleware(['auth'])->group(function () {
             ]);
 
         Route::get('admin/dataguru/{guru}', [GuruController::class, 'show'])->name('guru.show');
+        Route::get('admin/dataguru-import/template', [GuruController::class, 'downloadTemplate'])->name('guru.import.template');
+        Route::post('admin/dataguru-import', [GuruController::class, 'import'])->name('guru.import');
+        Route::get('admin/dataguru-export', [GuruController::class, 'export'])->name('guru.export');
 
         // Admin
         Route::resource('admin/dataadmin', AdminController::class)
@@ -108,6 +115,10 @@ Route::middleware(['auth'])->group(function () {
                 'update'  => 'tapel.update',
                 'destroy' => 'tapel.destroy',
             ]);
+
+        // Kenaikan Kelas
+        Route::get('/admin/tapel/{tapel}/kenaikan-kelas', [KenaikanKelasController::class, 'form'])->name('tapel.kenaikan.form');
+        Route::post('/admin/tapel/{tapel}/kenaikan-kelas', [KenaikanKelasController::class, 'process'])->name('tapel.kenaikan.process');
 
         // Kelas
         Route::resource('admin/kelas', KelasController::class)

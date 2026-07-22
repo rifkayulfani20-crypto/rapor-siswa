@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 use App\Models\{Siswa, Kelas, User, Nilai, Kehadiran, SikapSiswa, RiwayatKelas, TahunPelajaran};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class SiswaController extends Controller {
 
@@ -156,6 +157,147 @@ class SiswaController extends Controller {
 
         $siswa->delete();
         return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil dihapus!');
+    }
+
+    /**
+     * Unduh template CSV untuk import siswa massal.
+     */
+    public function downloadTemplate() {
+        $columns = ['nama','nis','nisn','email','password','jenis_kelamin','tempat_lahir','tanggal_lahir','alamat','nama_ayah','nama_ibu','nama_wali','no_hp_ortu','kelas','status'];
+        $contoh  = ['Ahmad Fauzi','2024001','0051234567','ahmad@sekolah.sch.id','','L','Jakarta','2010-05-12','Jl. Merdeka No. 1','Budi Santoso','Siti Aminah','','081234567890','7A','Aktif'];
+
+        return response()->streamDownload(function () use ($columns, $contoh) {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, $columns);
+            fputcsv($out, $contoh);
+            fclose($out);
+        }, 'template_import_siswa.csv', ['Content-Type' => 'text/csv']);
+    }
+
+    /**
+     * Import siswa secara massal dari file CSV.
+     * Kolom 'password' boleh dikosongkan → default memakai NIS.
+     * Kolom 'kelas' berisi nama kelas (contoh: 7A), akan dicocokkan ke tabel kelas.
+     */
+    public function import(Request $request) {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt|max:2048',
+        ]);
+
+        $handle = fopen($request->file('file')->getRealPath(), 'r');
+        $header = array_map(fn($h) => strtolower(trim($h)), fgetcsv($handle));
+
+        $success = 0;
+        $failed  = [];
+        $rowNum  = 1;
+
+        while (($row = fgetcsv($handle)) !== false) {
+            $rowNum++;
+            if (count(array_filter($row, fn($v) => trim((string) $v) !== '')) === 0) {
+                continue; // lewati baris kosong
+            }
+
+            $data = array_combine($header, array_pad($row, count($header), null));
+
+            $validator = Validator::make($data, [
+                'nama'          => 'required|string|max:255',
+                'nis'           => 'required|string|unique:siswas,nis',
+                'nisn'          => 'nullable|string|unique:siswas,nisn',
+                'email'         => 'required|email|unique:users,email',
+                'jenis_kelamin' => 'required|in:L,P',
+                'tanggal_lahir' => 'nullable|date',
+                'no_hp_ortu'    => 'nullable|numeric|digits_between:8,15',
+                'status'        => 'nullable|in:Aktif,Nonaktif',
+            ]);
+
+            if ($validator->fails()) {
+                $failed[] = "Baris $rowNum: " . implode(', ', $validator->errors()->all());
+                continue;
+            }
+
+            try {
+                $kelasId = null;
+                if (!empty($data['kelas'])) {
+                    $kelasId = Kelas::where('nama', trim($data['kelas']))->value('id');
+                    if (!$kelasId) {
+                        $failed[] = "Baris $rowNum: kelas '{$data['kelas']}' tidak ditemukan, siswa tetap disimpan tanpa kelas.";
+                    }
+                }
+
+                $password = !empty($data['password']) ? $data['password'] : $data['nis'];
+
+                $user = User::create([
+                    'name'     => $data['nama'],
+                    'email'    => $data['email'],
+                    'password' => Hash::make($password),
+                    'role'     => 'siswa',
+                ]);
+
+                $siswa = Siswa::create([
+                    'user_id'       => $user->id,
+                    'nama'          => $data['nama'],
+                    'nis'           => $data['nis'],
+                    'nisn'          => $data['nisn'] ?: null,
+                    'jenis_kelamin' => $data['jenis_kelamin'],
+                    'tempat_lahir'  => $data['tempat_lahir'] ?: null,
+                    'tanggal_lahir' => $data['tanggal_lahir'] ?: null,
+                    'alamat'        => $data['alamat'] ?: null,
+                    'nama_ayah'     => $data['nama_ayah'] ?: null,
+                    'nama_ibu'      => $data['nama_ibu'] ?: null,
+                    'nama_wali'     => $data['nama_wali'] ?: null,
+                    'no_hp_ortu'    => $data['no_hp_ortu'] ?: null,
+                    'kelas_id'      => $kelasId,
+                    'status'        => $data['status'] ?: 'Aktif',
+                ]);
+
+                $this->catatRiwayatKelas($siswa, $kelasId);
+                $success++;
+            } catch (\Throwable $e) {
+                $failed[] = "Baris $rowNum: gagal disimpan ({$e->getMessage()})";
+            }
+        }
+
+        fclose($handle);
+
+        return redirect()->route('siswa.index')
+            ->with('success', "$success siswa berhasil diimpor.")
+            ->with('import_errors', $failed);
+    }
+
+    /**
+     * Ekspor seluruh data siswa yang ada di database ke file CSV.
+     * Password tidak diikutkan karena tersimpan terenkripsi (hash), bukan teks asli.
+     */
+    public function export() {
+        $columns = ['nama','nis','nisn','email','jenis_kelamin','tempat_lahir','tanggal_lahir','alamat','nama_ayah','nama_ibu','nama_wali','no_hp_ortu','kelas','status'];
+
+        return response()->streamDownload(function () use ($columns) {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, $columns);
+
+            Siswa::with(['kelas', 'user'])->orderBy('nama')->chunk(200, function ($siswas) use ($out) {
+                foreach ($siswas as $s) {
+                    fputcsv($out, [
+                        $s->nama,
+                        $s->nis,
+                        $s->nisn,
+                        $s->user->email ?? '',
+                        $s->jenis_kelamin,
+                        $s->tempat_lahir,
+                        $s->tanggal_lahir,
+                        $s->alamat,
+                        $s->nama_ayah,
+                        $s->nama_ibu,
+                        $s->nama_wali,
+                        $s->no_hp_ortu,
+                        $s->kelas->nama ?? '',
+                        $s->status,
+                    ]);
+                }
+            });
+
+            fclose($out);
+        }, 'data_siswa_' . date('Y-m-d') . '.csv', ['Content-Type' => 'text/csv']);
     }
 
     /**

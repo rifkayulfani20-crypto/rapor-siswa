@@ -28,9 +28,7 @@
             @csrf
             @if(isset($siswa)) @method('PUT') @endif
 
-            {{-- ══════════════════════════════════════════════
                  SECTION 1: AKUN LOGIN
-            ══════════════════════════════════════════════ --}}
             <div style="background:#eaf4fb;border:1px solid #bee3f8;border-radius:8px;padding:16px 20px;margin-bottom:20px;">
                 <div style="font-weight:700;font-size:13px;color:#1a5276;margin-bottom:14px;display:flex;align-items:center;gap:7px;">
                     <i class="fa fa-key"></i> Akun Login Siswa
@@ -84,9 +82,8 @@
                 @endif
             </div>
 
-            {{-- ══════════════════════════════════════════════
+  
                  SECTION 2: DATA PRIBADI
-            ══════════════════════════════════════════════ --}}
             <div style="font-weight:700;font-size:13px;color:#1a3a6c;margin-bottom:12px;border-bottom:2px solid #e8edf2;padding-bottom:8px;">
                 <i class="fa fa-id-card"></i> Data Pribadi
             </div>
@@ -185,9 +182,7 @@
 
             </div>
 
-            {{-- ══════════════════════════════════════════════
                  SECTION 3: DATA ORANG TUA
-            ══════════════════════════════════════════════ --}}
             <div style="font-weight:700;font-size:13px;color:#1a3a6c;margin-bottom:12px;border-bottom:2px solid #e8edf2;padding-bottom:8px;">
                 <i class="fa fa-users"></i> Data Orang Tua / Wali
             </div>

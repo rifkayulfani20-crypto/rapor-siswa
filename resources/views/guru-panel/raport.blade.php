@@ -13,7 +13,7 @@
 </div>
 
 @forelse($kelass as $kelas)
-<div class="bg-white rounded-xl shadow-sm mb-6 overflow-hidden border border-gray-100">
+<div class="bg-white shadow-sm mb-6 overflow-hidden border border-gray-100">
 
     {{-- Header Kelas --}}
     <div class="flex items-center justify-between px-5 py-3 bg-[#1a3a6c]">

@@ -36,8 +36,8 @@
                         <td>{{ $p->kelas->nama ?? '-' }}</td>
                         <td>{{ $p->mataPelajaran->kkm ?? '-' }}</td>
                         <td>
-                            <span class="badge {{ $p->status == 'Aktif' ? 'badge-success' : 'badge-danger' }}">
-                                {{ $p->status }}
+                            <span class="badge {{ $p->sudah_diinput ? 'badge-success' : 'badge-danger' }}">
+                                {{ $p->sudah_diinput ? 'Sudah Diinput' : 'Belum Diinput' }}
                             </span>
                         </td>
                         <td>

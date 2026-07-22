@@ -11,6 +11,12 @@ class Kelas extends Model {
     public function siswas()         { return $this->hasMany(Siswa::class); }
     public function pembelajaran()   { return $this->hasMany(Pembelajaran::class); }
 
-    // Daftar siswa yang tercatat di kelas ini untuk tahun pelajaran tertentu
     public function riwayatKelas() { return $this->hasMany(RiwayatKelas::class); }
+
+    public function siswaHistoris()
+    {
+        return $this->belongsToMany(Siswa::class, 'riwayat_kelas', 'kelas_id', 'siswa_id')
+            ->withPivot('tahun_pelajaran_id')
+            ->withTimestamps();
+    }
 }

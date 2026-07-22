@@ -8,15 +8,23 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('gurus', function (Blueprint $table) {
-            $table->dropColumn('gelar');
-        });
+        // Cek dulu kolomnya ada atau tidak, supaya migration ini aman
+        // dijalankan baik di database lama (yang punya kolom 'gelar')
+        // maupun database baru yang dibangun dari nol (yang tidak pernah
+        // punya kolom ini, misalnya saat automated testing).
+        if (Schema::hasColumn('gurus', 'gelar')) {
+            Schema::table('gurus', function (Blueprint $table) {
+                $table->dropColumn('gelar');
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('gurus', function (Blueprint $table) {
-            $table->string('gelar')->nullable();
-        });
+        if (!Schema::hasColumn('gurus', 'gelar')) {
+            Schema::table('gurus', function (Blueprint $table) {
+                $table->string('gelar')->nullable();
+            });
+        }
     }
 };

@@ -46,11 +46,25 @@ class SiswaRaportController extends Controller
 
     public function index()
     {
+        $tapel = \App\Models\TahunPelajaran::where('aktif', true)->first();
+
+        // Rapor hanya boleh dilihat siswa setelah nilai dikunci
+        // (selesai diinput & difinalisasi) oleh Kepala Sekolah.
+        if (!$tapel || !$tapel->is_locked) {
+            return view('siswa-panel.raport-belum-siap');
+        }
+
         return view('siswa-panel.raport', $this->getData());
     }
 
     public function cetak()
     {
-        return view('siswa-panel.cetak-raport', $this->getData());
+        $tapel = \App\Models\TahunPelajaran::where('aktif', true)->first();
+
+        if (!$tapel || !$tapel->is_locked) {
+            return view('siswa-panel.raport-belum-siap');
+        }
+
+        return view('siswa-panel.raport', $this->getData());
     }
 }

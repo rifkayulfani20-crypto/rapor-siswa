@@ -130,6 +130,35 @@ class DashboardGuruController extends Controller
         return view('guru-panel.walikelas.kelas-siswa', compact('kelas'));
     }
 
+    public function nilaiMapelIndex()
+    {
+        $guruId = $this->getGuruId();
+        $tapel  = TahunPelajaran::aktif();
+
+        $pembelajarans = Pembelajaran::with(['mataPelajaran', 'kelas'])
+            ->where('guru_id', $guruId)
+            ->get()
+            ->map(function ($p) use ($tapel) {
+                $siswaIds = Siswa::where('kelas_id', $p->kelas_id)
+                    ->where('status', 'Aktif')
+                    ->pluck('id');
+
+                $totalSiswa = $siswaIds->count();
+
+                $siswaSudahDinilai = Nilai::where('mata_pelajaran_id', $p->mata_pelajaran_id)
+                    ->whereIn('siswa_id', $siswaIds)
+                    ->when($tapel, fn($q) => $q->where('tahun_pelajaran_id', $tapel->id))
+                    ->distinct('siswa_id')
+                    ->count('siswa_id');
+
+                $p->sudah_diinput = $totalSiswa > 0 && $siswaSudahDinilai >= $totalSiswa;
+
+                return $p;
+            });
+
+        return view('guru-panel.mapel.nilai', compact('pembelajarans'));
+    }
+
     public function nilaiSosialIndex()
     {
         $guruId = $this->getGuruId();
@@ -290,15 +319,6 @@ class DashboardGuruController extends Controller
             );
         }
         return back();
-    }
-
-    public function nilaiMapelIndex()
-    {
-        $guruId = $this->getGuruId();
-        $pembelajarans = Pembelajaran::with(['mataPelajaran', 'kelas'])
-            ->where('guru_id', $guruId)
-            ->get();
-        return view('guru-panel.mapel.nilai', compact('pembelajarans'));
     }
 
     public function nilaiEkskulIndex()

@@ -5,6 +5,19 @@
     @section('content')
     <div class="page-title"><i class="fa fa-print"></i> Cetak Raport</div>
 
+    {{-- Filter Tahun Ajaran --}}
+    <form method="GET" class="mb-5" style="display:flex;align-items:center;gap:8px;">
+        <label class="text-sm font-medium text-gray-600">Tahun Ajaran:</label>
+        <select name="tapel_id" onchange="this.form.submit()"
+            class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+            @foreach($tapelOptions as $opt)
+                <option value="{{ $opt->id }}" {{ $tapel && $tapel->id == $opt->id ? 'selected' : '' }}>
+                    {{ $opt->nama }} ({{ $opt->semester }}){{ $opt->aktif ? ' - Aktif' : '' }}
+                </option>
+            @endforeach
+        </select>
+    </form>
+
     {{-- Summary badge --}}
     <div class="mb-5">
         <span class="inline-flex items-center gap-2 bg-green-100 text-green-800 text-sm font-semibold px-4 py-2 rounded-full">
@@ -65,7 +78,7 @@
                             @endif
                         </td>
                         <td class="px-4 py-3 text-center">
-                            <a href="{{ route('raport.cetak', $siswa) }}" target="_blank"
+                            <a href="{{ route('raport.cetak', ['siswa' => $siswa, 'tapel_id' => $tapel?->id]) }}" target="_blank"
                             class="inline-flex items-center gap-1 bg-[#3498db] hover:bg-[#2980b9] text-white text-xs font-semibold px-3 py-2 rounded-md transition">
                                 <i class="fa fa-print"></i> Cetak
                             </a>

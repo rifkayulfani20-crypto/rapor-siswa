@@ -35,7 +35,7 @@
                         <th>Tempat Pembagian</th>
                         <th>Tanggal Pembagian</th>
                         <th width="80">Status</th>
-                        <th width="120">Aksi</th>
+                        <th width="150">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -55,6 +55,9 @@
                             <div style="display:flex;gap:4px;">
                                 <a href="{{ route('tapel.edit', $tapel->id) }}" class="btn btn-primary btn-sm" title="Edit">
                                     <i class="fa fa-edit"></i>
+                                </a>
+                                <a href="{{ route('tapel.kenaikan.form', $tapel->id) }}" class="btn btn-success btn-sm" title="Naikkan Kelas">
+                                    <i class="fa fa-arrow-up"></i>
                                 </a>
                                 <form method="POST" action="{{ route('tapel.destroy', $tapel->id) }}"
                                       style="display:inline"

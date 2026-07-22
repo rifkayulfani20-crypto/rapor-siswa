@@ -48,7 +48,7 @@
                         <th>Guru</th>
                         <th>Mata Pelajaran</th>
                         <th>Kelas</th>
-                        <th>Status</th>
+                        <th>Tahun Ajaran</th>
                         <th style="width:80px;">Aksi</th>
                     </tr>
                 </thead>
@@ -60,11 +60,9 @@
                         <td>{{ $p->mataPelajaran->nama ?? '-' }}</td>
                         <td>{{ $p->kelas->nama ?? '-' }}</td>
                         <td>
-                            @if($p->status === 'Aktif')
-                                <span class="badge badge-success">Aktif</span>
-                            @else
-                                <span class="badge badge-warning">{{ $p->status }}</span>
-                            @endif
+                            <span class="badge badge-success">
+                                {{ $p->tahunPelajaran->nama ?? '-' }} {{ $p->tahunPelajaran->semester ?? '' }}
+                            </span>
                         </td>
                         <td>
                             <div style="display:flex; gap:4px;">

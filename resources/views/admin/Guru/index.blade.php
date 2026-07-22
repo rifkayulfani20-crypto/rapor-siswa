@@ -9,6 +9,12 @@
             <a href="{{ route('guru.create') }}" class="btn btn-primary">
                 <i class="fa fa-plus"></i> Guru
             </a>
+            <button type="button" class="btn btn-success" onclick="document.getElementById('importModal').style.display='flex'">
+                <i class="fa fa-file-import"></i> Import Excel/CSV
+            </button>
+            <a href="{{ route('guru.export') }}" class="btn" style="background:#17a2b8;color:#fff;">
+                <i class="fa fa-file-export"></i> Export Excel/CSV
+            </a>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
             <a href="#" class="btn btn-info btn-sm" title="Info">
@@ -17,6 +23,23 @@
         </div>
     </div>
     <div class="card-body">
+
+        @if(session('success'))
+        <div class="alert alert-success" style="margin-bottom:16px;">
+            <i class="fa fa-check-circle"></i> {{ session('success') }}
+        </div>
+        @endif
+
+        @if(session('import_errors') && count(session('import_errors')) > 0)
+        <div class="alert alert-danger" style="margin-bottom:16px;">
+            <i class="fa fa-exclamation-circle"></i> Beberapa baris tidak berhasil diimpor:
+            <ul style="margin:6px 0 0;padding-left:18px;">
+                @foreach(session('import_errors') as $err)
+                    <li>{{ $err }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
 
         <div class="table-toolbar">
             <div style="display:flex;align-items:center;gap:8px;">
@@ -96,6 +119,29 @@
             </div>
         </div>
 
+    </div>
+</div>
+
+{{-- Modal Import CSV --}}
+<div id="importModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);align-items:center;justify-content:center;z-index:1000;">
+    <div style="background:#fff;border-radius:10px;padding:20px 24px;width:420px;max-width:90%;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <span style="font-weight:700;font-size:14px;color:#2c3e50;"><i class="fa fa-file-import"></i> Import Data Guru</span>
+            <span style="cursor:pointer;color:#999;" onclick="document.getElementById('importModal').style.display='none'"><i class="fa fa-times"></i></span>
+        </div>
+        <p style="font-size:12px;color:#666;margin-bottom:12px;">
+            Unggah file CSV untuk menambahkan banyak guru sekaligus.
+            Belum punya file? <a href="{{ route('guru.import.template') }}">Unduh template CSV</a> dulu, isi datanya, lalu simpan sebagai CSV.
+        </p>
+        <form method="POST" action="{{ route('guru.import') }}" enctype="multipart/form-data">
+            @csrf
+            <input type="file" name="file" accept=".csv,.txt" required
+                style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:13px;margin-bottom:14px;">
+            <div style="display:flex;gap:8px;">
+                <button type="submit" class="btn btn-primary" style="flex:1;"><i class="fa fa-upload"></i> Proses Import</button>
+                <button type="button" class="btn" style="background:#ddd;color:#555;" onclick="document.getElementById('importModal').style.display='none'">Batal</button>
+            </div>
+        </form>
     </div>
 </div>
 @endsection

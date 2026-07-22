@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
     <html lang="id">
     <head>
         <meta charset="UTF-8">
@@ -118,12 +118,12 @@
                     <td>{{ $tapel->semester }}</td>
                 </tr>
                 <tr>
-                    <td>Wali Kelas</td>
-                    <td>{{ $siswa->kelas->waliKelas->nama ?? '-' }}</td>
-                </tr>
-                <tr>
                     <td>Tahun Pelajaran</td>
                     <td>{{ $tapel->nama ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <td>Wali Kelas</td>
+                    <td>{{ $siswa->kelas->waliKelas->nama ?? '-' }}</td>
                 </tr>
             </table>
         </div>
@@ -237,19 +237,19 @@
                 <div class="kehadiran-list">
                     <div class="row">
                         <span>Sakit</span>
-                        <span>: <span class="angka" style="color:#e74c3c;">{{ $kehadiran->sakit ?? 0 }}</span> hari</span>
+                        <span>: <span class="angka">{{ $kehadiran->sakit ?? 0 }}</span> hari</span>
                     </div>
                     <div class="row">
                         <span>Izin</span>
-                        <span>: <span class="angka" style="color:#e67e22;">{{ $kehadiran->izin ?? 0 }}</span> hari</span>
+                        <span>: <span class="angka">{{ $kehadiran->izin ?? 0 }}</span> hari</span>
                     </div>
                     <div class="row">
                         <span>Tanpa Keterangan</span>
-                        <span>: <span class="angka" style="color:#8e44ad;">{{ $kehadiran->tanpa_keterangan ?? 0 }}</span> hari</span>
+                        <span>: <span class="angka">{{ $kehadiran->tanpa_keterangan ?? 0 }}</span> hari</span>
                     </div>
                     <div class="row" style="margin-top:4px;font-weight:bold;">
                         <span>Total Tidak Hadir</span>
-                        <span>: <span class="angka" style="color:#2c3e50;">
+                        <span>: <span class="angka">
                             {{ ($kehadiran->sakit ?? 0) + ($kehadiran->izin ?? 0) + ($kehadiran->tanpa_keterangan ?? 0) }}
                         </span> hari</span>
                     </div>
