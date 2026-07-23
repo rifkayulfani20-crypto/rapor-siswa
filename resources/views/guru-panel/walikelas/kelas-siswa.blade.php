@@ -17,7 +17,7 @@
         </div>
         <div>
             <div style="font-size:11px;color:#7f8c8d;text-transform:uppercase;letter-spacing:1px;">Tahun Pelajaran</div>
-            <div style="font-size:15px;font-weight:700;color:#2c3e50;">{{ $kelas->tahunPelajaran->tahun_pelajaran ?? '-' }} - Semester {{ $kelas->tahunPelajaran->semester ?? '-' }}</div>
+            <div style="font-size:15px;font-weight:700;color:#2c3e50;">{{ $kelas->tahunPelajaran->nama ?? '-' }} - Semester {{ $kelas->tahunPelajaran->semester ?? '-' }}</div>
         </div>
         <div>
             <div style="font-size:11px;color:#7f8c8d;text-transform:uppercase;letter-spacing:1px;">Jumlah Siswa</div>

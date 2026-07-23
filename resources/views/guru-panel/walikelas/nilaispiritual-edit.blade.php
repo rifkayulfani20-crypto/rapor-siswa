@@ -14,11 +14,11 @@
             </tr>
             <tr>
                 <td style="padding:3px 0;color:#555;">Tahun Pelajaran</td>
-                <td style="padding:3px 0;">: <strong>{{ $kelas->tahunPelajaran->tahun_pelajaran ?? '-' }}</strong></td>
+                <td style="padding:3px 0;">: <strong>{{ $kelas->tahunPelajaran->nama ?? '-' }}</strong></td>
             </tr>
             <tr>
                 <td style="padding:3px 0;color:#555;">Semester</td>
-                <td style="padding:3px 0;">: <strong>{{ $kelas->tahunPelajaran->semester ?? '-' }} / {{ $kelas->tahunPelajaran->semester == 1 ? 'Ganjil' : 'Genap' }}</strong></td>
+                <td style="padding:3px 0;">: <strong>{{ $kelas->tahunPelajaran->semester ?? '-' }}</strong></td>
             </tr>
         </table>
     </div>

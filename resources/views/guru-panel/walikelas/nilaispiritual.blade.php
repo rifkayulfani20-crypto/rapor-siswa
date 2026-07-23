@@ -33,7 +33,7 @@
                         <td>{{ $i + 1 }}</td>
                         <td>{{ $kelas->nama }}</td>
                         <td>{{ $kelas->waliKelas->nama ?? '-' }}</td>
-                        <td>{{ $kelas->tahunPelajaran->tahun_pelajaran ?? '-' }} - Semester {{ $kelas->tahunPelajaran->semester ?? '-' }}</td>
+                        <td>{{ $kelas->tahunPelajaran->nama ?? '-' }} - Semester {{ $kelas->tahunPelajaran->semester ?? '-' }}</td>
                         <td>
                             <a href="{{ route('guru.walikelas.nilaiSpiritual.edit', $kelas->id) }}"
                                class="btn btn-primary btn-sm" title="Input Nilai Spiritual">
