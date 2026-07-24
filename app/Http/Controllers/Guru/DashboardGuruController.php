@@ -126,19 +126,33 @@ class DashboardGuruController extends Controller
 
     public function kelasSiswa($kelas)
     {
-        $kelas = Kelas::with(['waliKelas', 'tahunPelajaran', 'siswas'])->findOrFail($kelas);
+        $kelas = Kelas::with(['waliKelas', 'tahunPelajaran'])->findOrFail($kelas);
+        $kelas->setRelation('siswas', $kelas->rosterSiswa());
         return view('guru-panel.walikelas.kelas-siswa', compact('kelas'));
     }
 
-    public function nilaiMapelIndex()
+    public function nilaiMapelIndex(\Illuminate\Http\Request $request)
     {
         $guruId = $this->getGuruId();
-        $tapel  = TahunPelajaran::aktif();
 
-        $pembelajarans = Pembelajaran::with(['mataPelajaran', 'kelas'])
+        $tapelIdsGuru = Pembelajaran::where('guru_id', $guruId)->pluck('tahun_pelajaran_id')->unique();
+        $tapelList = TahunPelajaran::whereIn('id', $tapelIdsGuru)->orderByDesc('id')->get();
+
+        // Default: tampilkan SEMUA tahun ajaran (bukan cuma yang aktif secara
+        // global), sama seperti halaman Raport, supaya guru tetap bisa lihat
+        // mapel-nya di tahun ajaran yang sudah tidak aktif.
+        $tapelFilterId = $request->input('tapel_id', '');
+
+        $pembelajarans = Pembelajaran::with(['mataPelajaran', 'kelas', 'tahunPelajaran'])
             ->where('guru_id', $guruId)
+            ->when($tapelFilterId, fn($q) => $q->where('tahun_pelajaran_id', $tapelFilterId))
             ->get()
-            ->map(function ($p) use ($tapel) {
+            ->map(function ($p) {
+                // PENTING: pakai tahun_pelajaran_id milik Pembelajaran ini
+                // sendiri, bukan TahunPelajaran::aktif(). Kalau pakai tahun
+                // aktif, status "Sudah/Belum Diinput" bisa salah tampil untuk
+                // baris yang tahun ajarannya beda dari yang sedang ditandai
+                // aktif secara global.
                 $siswaIds = Siswa::where('kelas_id', $p->kelas_id)
                     ->where('status', 'Aktif')
                     ->pluck('id');
@@ -147,7 +161,7 @@ class DashboardGuruController extends Controller
 
                 $siswaSudahDinilai = Nilai::where('mata_pelajaran_id', $p->mata_pelajaran_id)
                     ->whereIn('siswa_id', $siswaIds)
-                    ->when($tapel, fn($q) => $q->where('tahun_pelajaran_id', $tapel->id))
+                    ->where('tahun_pelajaran_id', $p->tahun_pelajaran_id)
                     ->distinct('siswa_id')
                     ->count('siswa_id');
 
@@ -156,7 +170,7 @@ class DashboardGuruController extends Controller
                 return $p;
             });
 
-        return view('guru-panel.mapel.nilai', compact('pembelajarans'));
+        return view('guru-panel.mapel.nilai', compact('pembelajarans', 'tapelList', 'tapelFilterId'));
     }
 
     public function nilaiSosialIndex()
@@ -170,9 +184,17 @@ class DashboardGuruController extends Controller
 
     public function nilaiSosialEdit($kelas)
     {
-        $kelas = Kelas::with(['waliKelas', 'tahunPelajaran', 'siswas'])->findOrFail($kelas);
+        $kelas = Kelas::with(['waliKelas', 'tahunPelajaran'])->findOrFail($kelas);
+        $kelas->setRelation('siswas', $kelas->rosterSiswa());
         $tapel = $kelas->tahunPelajaran;
-        return view('guru-panel.walikelas.nilaisosial-edit', compact('kelas', 'tapel'));
+        // Ambil nilai sosial yang sudah pernah diisi supaya form ini "nempel"
+        // sama seperti halaman Ketidakhadiran, bukan selalu tampil kosong.
+        $sikapData = SikapSiswa::where('kelas_id', $kelas->id)
+                        ->where('tahun_pelajaran_id', $kelas->tahun_pelajaran_id)
+                        ->whereIn('siswa_id', $kelas->siswas->pluck('id'))
+                        ->get()
+                        ->keyBy('siswa_id');
+        return view('guru-panel.walikelas.nilaisosial-edit', compact('kelas', 'tapel', 'sikapData'));
     }
 
     public function nilaiSosialUpdate(Request $request, $kelas)
@@ -213,9 +235,17 @@ class DashboardGuruController extends Controller
 
     public function nilaiSpiritualEdit($kelas)
     {
-        $kelas = Kelas::with(['waliKelas', 'tahunPelajaran', 'siswas'])->findOrFail($kelas);
+        $kelas = Kelas::with(['waliKelas', 'tahunPelajaran'])->findOrFail($kelas);
+        $kelas->setRelation('siswas', $kelas->rosterSiswa());
         $tapel = $kelas->tahunPelajaran;
-        return view('guru-panel.walikelas.nilaispiritual-edit', compact('kelas', 'tapel'));
+        // Sama seperti nilaiSosialEdit: ambil data yang sudah pernah diisi
+        // supaya form-nya tidak selalu terlihat kosong.
+        $sikapData = SikapSiswa::where('kelas_id', $kelas->id)
+                        ->where('tahun_pelajaran_id', $kelas->tahun_pelajaran_id)
+                        ->whereIn('siswa_id', $kelas->siswas->pluck('id'))
+                        ->get()
+                        ->keyBy('siswa_id');
+        return view('guru-panel.walikelas.nilaispiritual-edit', compact('kelas', 'tapel', 'sikapData'));
     }
 
     public function nilaiSpiritualUpdate(Request $request, $kelas)
@@ -256,7 +286,8 @@ class DashboardGuruController extends Controller
 
     public function ketidakhadiranEdit($kelas)
     {
-        $kelas = Kelas::with(['waliKelas', 'tahunPelajaran', 'siswas'])->findOrFail($kelas);
+        $kelas = Kelas::with(['waliKelas', 'tahunPelajaran'])->findOrFail($kelas);
+        $kelas->setRelation('siswas', $kelas->rosterSiswa());
         $tapel = $kelas->tahunPelajaran;
         $ketidakhadiranData = Kehadiran::where('tahun_pelajaran_id', $kelas->tahun_pelajaran_id)
                         ->whereIn('siswa_id', $kelas->siswas->pluck('id'))
@@ -267,7 +298,7 @@ class DashboardGuruController extends Controller
 
     public function ketidakhadiranUpdate(Request $request, $kelas)
     {
-        $kelasModel = Kelas::with(['tahunPelajaran', 'siswas'])->findOrFail($kelas);
+        $kelasModel = Kelas::with('tahunPelajaran')->findOrFail($kelas);
         $tapel = $kelasModel->tahunPelajaran;
 
         if ($tapel && $tapel->is_locked) {
@@ -304,7 +335,8 @@ class DashboardGuruController extends Controller
 
     public function catatanEdit($kelas)
     {
-        $kelas = Kelas::with(['waliKelas', 'tahunPelajaran', 'siswas'])->findOrFail($kelas);
+        $kelas = Kelas::with(['waliKelas', 'tahunPelajaran'])->findOrFail($kelas);
+        $kelas->setRelation('siswas', $kelas->rosterSiswa());
         return view('guru-panel.walikelas.catatan-edit', compact('kelas'));
     }
 
@@ -337,7 +369,8 @@ class DashboardGuruController extends Controller
 
     public function nilaiAkhirDetail($id)
     {
-        $kelas = Kelas::with(['waliKelas', 'tahunPelajaran', 'siswas'])->findOrFail($id);
+        $kelas = Kelas::with(['waliKelas', 'tahunPelajaran'])->findOrFail($id);
+        $kelas->setRelation('siswas', $kelas->rosterSiswa());
         $pembelajarans = Pembelajaran::with('mataPelajaran')
             ->where('kelas_id', $id)
             ->get();
@@ -349,19 +382,36 @@ class DashboardGuruController extends Controller
         return view('guru-panel.nilaiakhir-detail', compact('kelas', 'pembelajarans', 'siswas', 'nilais'));
     }
 
-    public function raport()
+    public function raport(\Illuminate\Http\Request $request)
     {
         $guruId = $this->getGuruId();
-        $kelass = Kelas::with(['waliKelas', 'tahunPelajaran', 'siswas'])
+
+        $tapelIdsGuru = Kelas::where('wali_kelas_id', $guruId)->pluck('tahun_pelajaran_id')->unique();
+        $tapelList = TahunPelajaran::whereIn('id', $tapelIdsGuru)->orderByDesc('id')->get();
+
+        // Default: tampilkan SEMUA tahun ajaran. Jangan default ke tahun
+        // ajaran yang aktif secara global — guru ini belum tentu punya
+        // kelas di tahun yang sedang aktif itu, itu penyebab datanya
+        // kelihatan kosong padahal sebenarnya ada di tahun lain.
+        $tapelFilterId = $request->input('tapel_id', '');
+
+        $kelass = Kelas::with(['waliKelas', 'tahunPelajaran'])
             ->where('wali_kelas_id', $guruId)
-            ->get();
-        return view('guru-panel.raport', compact('kelass'));
+            ->when($tapelFilterId, fn($q) => $q->where('tahun_pelajaran_id', $tapelFilterId))
+            ->orderByDesc('tahun_pelajaran_id')
+            ->get()
+            ->map(function ($k) {
+                $k->setRelation('siswas', $k->rosterSiswa());
+                return $k;
+            });
+
+        return view('guru-panel.raport', compact('kelass', 'tapelList', 'tapelFilterId'));
     }
 
-    public function raportCetak(\App\Models\Siswa $siswa)
+    public function raportCetak($kelas, \App\Models\Siswa $siswa)
     {
-        $siswa->load('kelas.tahunPelajaran');
-        $tapel = $siswa->kelas->tahunPelajaran;
+        $kelas = Kelas::with('tahunPelajaran')->findOrFail($kelas);
+        $tapel = $kelas->tahunPelajaran;
 
         $nilais = Nilai::with('mataPelajaran')
             ->where('siswa_id', $siswa->id)
@@ -369,7 +419,7 @@ class DashboardGuruController extends Controller
             ->get();
 
         $sikap = SikapSiswa::where('siswa_id', $siswa->id)
-            ->where('kelas_id', $siswa->kelas_id)
+            ->where('kelas_id', $kelas->id)
             ->where('tahun_pelajaran_id', $tapel->id)
             ->first();
 
@@ -377,7 +427,9 @@ class DashboardGuruController extends Controller
             ->where('tahun_pelajaran_id', $tapel->id)
             ->first();
 
-        $semuaSiswaKelas = Siswa::where('kelas_id', $siswa->kelas_id)->pluck('id');
+        // Ambil roster kelas secara historis (bukan siswa->kelas_id saat ini),
+        // supaya peringkat tetap benar walau siswa sudah naik kelas/lulus.
+        $semuaSiswaKelas = $kelas->rosterSiswa()->pluck('id');
         $rataRataSiswa = [];
         foreach ($semuaSiswaKelas as $sid) {
             $avg = Nilai::where('siswa_id', $sid)
@@ -391,7 +443,7 @@ class DashboardGuruController extends Controller
         $rataRata   = round($nilais->avg('nilai_akhir'), 2);
 
         return view('guru-panel.raport-cetak', compact(
-            'siswa', 'tapel', 'nilais', 'sikap', 'kehadiran',
+            'siswa', 'kelas', 'tapel', 'nilais', 'sikap', 'kehadiran',
             'peringkat', 'totalSiswa', 'rataRata'
         ));
     }

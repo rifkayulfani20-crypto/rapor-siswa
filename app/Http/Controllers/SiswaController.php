@@ -310,13 +310,18 @@ class SiswaController extends Controller {
             return;
         }
 
-        $tapel = TahunPelajaran::aktif();
-        if (!$tapel) {
+        // PENTING: pakai tahun_pelajaran_id milik KELAS itu sendiri, bukan
+        // TahunPelajaran::aktif(). Kalau pakai tahun aktif, riwayat bisa
+        // tersimpan di tahun ajaran yang salah setiap kali status "Aktif"
+        // tidak sinkron dengan tahun ajaran kelas yang sedang diisi siswa
+        // (itu penyebab siswa hilang dari roster meski datanya ada).
+        $kelas = Kelas::find($kelasId);
+        if (!$kelas) {
             return;
         }
 
         RiwayatKelas::updateOrCreate(
-            ['siswa_id' => $siswa->id, 'tahun_pelajaran_id' => $tapel->id],
+            ['siswa_id' => $siswa->id, 'tahun_pelajaran_id' => $kelas->tahun_pelajaran_id],
             ['kelas_id' => $kelasId]
         );
     }

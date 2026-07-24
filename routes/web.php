@@ -205,7 +205,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/nilaiakhir', [DashboardGuruController::class, 'nilaiAkhir'])->name('nilaiakhir');
         Route::get('/nilaiakhir/{kelas}', [DashboardGuruController::class, 'nilaiAkhirDetail'])->name('nilaiakhir.detail');
         Route::get('/raport', [DashboardGuruController::class, 'raport'])->name('raport');
-        Route::get('/raport/cetak/{siswa}', [DashboardGuruController::class, 'raportCetak'])->name('raport.cetak');
+        Route::get('/raport/cetak/{kelas}/{siswa}', [DashboardGuruController::class, 'raportCetak'])->name('raport.cetak');
         Route::get('/datakelas/{kelas}/siswa', [DashboardGuruController::class, 'kelasSiswa'])->name('walikelas.kelas.siswa');
     });
 

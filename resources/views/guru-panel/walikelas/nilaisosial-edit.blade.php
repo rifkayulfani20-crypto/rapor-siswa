@@ -55,6 +55,7 @@
                     </thead>
                     <tbody>
                         @forelse($kelas->siswas as $i => $siswa)
+                        @php $existing = $sikapData->get($siswa->id); @endphp
                         <tr>
                             <td>{{ $i + 1 }}</td>
                             <td>{{ $siswa->nis }}</td>
@@ -62,18 +63,19 @@
                             <td>{{ $siswa->jenis_kelamin }}</td>
                             <td>
                                 <input type="hidden" name="siswa_id[]" value="{{ $siswa->id }}">
+                                @php $predikatTerpilih = old('predikat.'.$i, $existing->predikat_sosial ?? ''); @endphp
                                 <select name="predikat[]" class="form-control predikat-select" style="font-size:12px;padding:6px 8px;">
                                     <option value="">-- Pilih --</option>
-                                    <option value="A (Sangat Baik)" {{ old('predikat.'.$i) == 'A (Sangat Baik)' ? 'selected' : '' }}>A (Sangat Baik)</option>
-                                    <option value="B (Baik)"        {{ old('predikat.'.$i) == 'B (Baik)'        ? 'selected' : '' }}>B (Baik)</option>
-                                    <option value="C (Cukup)"       {{ old('predikat.'.$i) == 'C (Cukup)'       ? 'selected' : '' }}>C (Cukup)</option>
-                                    <option value="D (Perlu Bimbingan)" {{ old('predikat.'.$i) == 'D (Perlu Bimbingan)' ? 'selected' : '' }}>D (Perlu Bimbingan)</option>
+                                    <option value="A (Sangat Baik)" {{ $predikatTerpilih == 'A (Sangat Baik)' ? 'selected' : '' }}>A (Sangat Baik)</option>
+                                    <option value="B (Baik)"        {{ $predikatTerpilih == 'B (Baik)'        ? 'selected' : '' }}>B (Baik)</option>
+                                    <option value="C (Cukup)"       {{ $predikatTerpilih == 'C (Cukup)'       ? 'selected' : '' }}>C (Cukup)</option>
+                                    <option value="D (Perlu Bimbingan)" {{ $predikatTerpilih == 'D (Perlu Bimbingan)' ? 'selected' : '' }}>D (Perlu Bimbingan)</option>
                                 </select>
                             </td>
                             <td>
                                 <textarea name="deskripsi[]" class="form-control deskripsi-input" rows="3"
                                     style="font-size:12px;resize:vertical;"
-                                    placeholder="Masukkan deskripsi">{{ old('deskripsi.'.$i) }}</textarea>
+                                    placeholder="Masukkan deskripsi">{{ old('deskripsi.'.$i, $existing->deskripsi_sosial ?? '') }}</textarea>
                             </td>
                         </tr>
                         @empty

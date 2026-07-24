@@ -2,7 +2,7 @@
 @section('title', 'Cetak Raport')
 @section('content')
 
-<div class="flex items-center justify-between mb-6">
+<div class="flex items-center justify-between mb-4 flex-wrap gap-3">
     <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
         <i class="fas fa-print text-[#1a3a6c]"></i> Cetak Raport
     </h1>
@@ -12,11 +12,24 @@
     </span>
 </div>
 
-@forelse($kelass as $kelas)
-<div class="bg-white shadow-sm mb-6 overflow-hidden border border-gray-100">
+<div class="mb-6">
+    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Tahun Ajaran</label>
+    <select onchange="window.location.href='{{ route('guru.raport') }}?tapel_id='+this.value"
+            class="w-full sm:w-72 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1a3a6c]/20 focus:border-[#1a3a6c]">
+        <option value="">Semua Tahun Ajaran</option>
+        @foreach($tapelList as $t)
+            <option value="{{ $t->id }}" {{ (string) $tapelFilterId === (string) $t->id ? 'selected' : '' }}>
+                {{ $t->nama }} {{ $t->semester }} {{ $t->aktif ? '(Aktif)' : '' }}
+            </option>
+        @endforeach
+    </select>
+</div>
 
-    {{-- Header Kelas --}}
-    <div class="flex items-center justify-between px-5 py-3 bg-[#1a3a6c]">
+@forelse($kelass as $kelas)
+<div class="bg-white shadow-sm mb-4 overflow-hidden border border-gray-100 rounded-lg">
+
+    <div class="flex items-center justify-between px-5 py-3 bg-[#1a3a6c] {{ $kelas->siswas->count() === 0 ? 'cursor-pointer' : '' }}"
+         @if($kelas->siswas->count() === 0) onclick="toggleKelas({{ $kelas->id }})" @endif>
         <span class="text-white font-semibold text-sm flex items-center gap-2">
             <i class="fas fa-door-open"></i>
             {{ $kelas->nama }}
@@ -26,13 +39,17 @@
                 Sem. {{ $kelas->tahunPelajaran->semester ?? '-' }}
             </span>
         </span>
-        <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full">
-            {{ $kelas->siswas->count() }} Siswa
+        <span class="flex items-center gap-2">
+            <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                {{ $kelas->siswas->count() }} Siswa
+            </span>
+            @if($kelas->siswas->count() === 0)
+                <i class="fas fa-chevron-down text-blue-200 text-xs" id="chevron-{{ $kelas->id }}"></i>
+            @endif
         </span>
     </div>
 
-    {{-- Tabel --}}
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto {{ $kelas->siswas->count() === 0 ? 'hidden' : '' }}" id="body-{{ $kelas->id }}">
         <table class="w-full text-sm">
             <thead class="bg-gray-50 border-b border-gray-200">
                 <tr>
@@ -61,7 +78,7 @@
                         @endif
                     </td>
                     <td class="px-4 py-3 text-center">
-                        <a href="{{ route('guru.raport.cetak', $siswa->id) }}" target="_blank"
+                        <a href="{{ route('guru.raport.cetak', [$kelas->id, $siswa->id]) }}" target="_blank"
                            class="inline-flex items-center gap-1.5 bg-[#1a3a6c] hover:bg-[#122a52] text-white text-xs font-semibold px-3 py-2 rounded-lg transition-colors">
                             <i class="fas fa-print"></i> Cetak
                         </a>
@@ -83,8 +100,17 @@
 @empty
 <div class="bg-white rounded-xl shadow-sm p-12 text-center text-gray-400 border border-gray-100">
     <i class="fas fa-folder-open text-4xl block mb-3 text-gray-300"></i>
-    <p class="text-sm">Anda tidak memiliki kelas yang ditangani.</p>
+    <p class="text-sm">Tidak ada kelas untuk tahun ajaran yang dipilih.</p>
 </div>
 @endforelse
+
+<script>
+function toggleKelas(id) {
+    const body = document.getElementById('body-' + id);
+    const chevron = document.getElementById('chevron-' + id);
+    body.classList.toggle('hidden');
+    chevron.classList.toggle('rotate-180');
+}
+</script>
 
 @endsection
